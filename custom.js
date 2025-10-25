@@ -15,15 +15,46 @@ const FALLBACK_DATA = {
     html_url: `https://github.com/${GITHUB_USERNAME}`,
     public_repos: 0,
     followers: 0,
-    following: 0
+    following: 0,
 };
+
+// ========== INITIALIZATION ==========
+document.addEventListener("DOMContentLoaded", () => {
+    // Wait for jQuery to be fully loaded
+    if (typeof jQuery === "undefined") {
+        console.error("jQuery is not loaded!");
+        return;
+    }
+
+    initializeApp();
+});
+
+function initializeApp() {
+    // Set current year
+    const yearEl = document.getElementById("year");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    // Initialize components
+    typeEffect();
+    initParticles();
+    renderSkills();
+    fetchGitHubData();
+    fetchGitHubRepos();
+    initScrollAnimations();
+    initContactForm();
+
+    // Animate skill progress bars after a delay
+    setTimeout(() => {
+        animateSkillBars();
+    }, 500);
+}
 
 // ========== TYPING EFFECT ==========
 const typingTexts = [
     "Full Stack Developer",
     "WordPress Expert",
     "UI/UX Designer",
-    "Problem Solver"
+    "Problem Solver",
 ];
 
 let textIndex = 0;
@@ -115,7 +146,9 @@ function initParticles() {
 
                 if (distance < 150) {
                     ctx.beginPath();
-                    ctx.strokeStyle = `rgba(99, 102, 241, ${0.2 - distance / 750})`;
+                    ctx.strokeStyle = `rgba(99, 102, 241, ${
+                        0.2 - distance / 750
+                    })`;
                     ctx.lineWidth = 0.5;
                     ctx.moveTo(particle.x, particle.y);
                     ctx.lineTo(particles[j].x, particles[j].y);
@@ -158,28 +191,28 @@ function updateUserUI(data) {
 
     // Update all avatar instances
     const avatars = ["navAvatar", "heroAvatar"];
-    avatars.forEach(id => {
+    avatars.forEach((id) => {
         const el = document.getElementById(id);
         if (el) el.src = avatar;
     });
 
     // Update names
     const names = ["navName", "heroName", "footerName"];
-    names.forEach(id => {
+    names.forEach((id) => {
         const el = document.getElementById(id);
         if (el) el.textContent = name;
     });
 
     // Update bio
     const bioElements = ["heroBio", "aboutBio"];
-    bioElements.forEach(id => {
+    bioElements.forEach((id) => {
         const el = document.getElementById(id);
         if (el && bio) el.textContent = bio;
     });
 
     // Update location
     const locationElements = ["aboutLocation", "contactLocation"];
-    locationElements.forEach(id => {
+    locationElements.forEach((id) => {
         const el = document.getElementById(id);
         if (el && location) el.textContent = location;
     });
@@ -193,7 +226,7 @@ function updateUserUI(data) {
 
     // Update GitHub link
     const githubLink = document.getElementById("githubLink");
-    if (githubLink) githubLink.href = data.html_url;
+    if (githubLink) githubLink.href = data.html_url || FALLBACK_DATA.html_url;
 
     // Update stats
     const reposCount = document.getElementById("reposCount");
@@ -219,14 +252,17 @@ async function fetchGitHubRepos() {
 
         // Filter and sort repos
         const filtered = repos
-            .filter(repo => !repo.fork)
+            .filter((repo) => !repo.fork)
             .sort((a, b) => b.stargazers_count - a.stargazers_count);
 
         if (filtered.length > 0) {
             displayProjects(filtered);
 
             // Calculate total stars
-            const totalStars = filtered.reduce((sum, repo) => sum + repo.stargazers_count, 0);
+            const totalStars = filtered.reduce(
+                (sum, repo) => sum + repo.stargazers_count,
+                0
+            );
             const starsCount = document.getElementById("starsCount");
             if (starsCount) animateCounter(starsCount, totalStars);
         } else {
@@ -240,28 +276,22 @@ async function fetchGitHubRepos() {
 
 function displayProjects(repos) {
     const slider = document.getElementById("projectsSlider");
-    const dots = document.getElementById("sliderDots");
-
-    if (!slider || !dots) return;
+    if (!slider) return;
 
     slider.innerHTML = "";
-    dots.innerHTML = "";
 
-    // Show only pinned or top repos
+    // Show only top repos
     const displayRepos = repos.slice(0, 12);
 
-    displayRepos.forEach((repo, index) => {
+    displayRepos.forEach((repo) => {
         const card = createProjectCard(repo);
         slider.appendChild(card);
-
-        const dot = document.createElement("div");
-        dot.className = "dot";
-        if (index === 0) dot.classList.add("active");
-        dot.addEventListener("click", () => goToSlide(index));
-        dots.appendChild(dot);
     });
 
-    setTimeout(initSlider, 100);
+    // Initialize Slick Slider after adding cards
+    setTimeout(() => {
+        initSlickSlider();
+    }, 100);
 }
 
 function createProjectCard(repo) {
@@ -270,36 +300,79 @@ function createProjectCard(repo) {
 
     const color = getLanguageColor(repo.language);
     const name = formatRepoName(repo.name);
-    const desc = repo.description || "A great project built with passion and dedication.";
+    const desc =
+        repo.description ||
+        "A great project built with passion and dedication.";
     const shortDesc = desc.length > 120 ? desc.substring(0, 120) + "..." : desc;
 
     card.innerHTML = `
         <div class="project-image" style="background: linear-gradient(135deg, ${color}33 0%, ${color}11 100%);">
             <div class="project-overlay">
-                <a href="${repo.html_url}" class="project-link" target="_blank" rel="noopener noreferrer" title="View on GitHub">
-                    <i class="fab fa-github"></i>
+                <a href="${
+                    repo.html_url
+                }" class="project-link" target="_blank" rel="noopener noreferrer" title="View on GitHub">
+                <i class="fab fa-github"></i>
                 </a>
-                ${repo.homepage ? `
+                ${
+                    repo.homepage
+                        ? `
                     <a href="${repo.homepage}" class="project-link" target="_blank" rel="noopener noreferrer" title="Live Demo">
                         <i class="fas fa-external-link-alt"></i>
                     </a>
-                ` : ""}
+                `
+                        : ""
+                }
+                <div class="project-title">
+                    <a href="${repo.homepage || repo.html_url}"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                        <h3>${escapeHtml(name)}</h3>
+                    </a>
+                </div>
             </div>
-        </div>
-        <div class="project-content">
+            <div class="project-content">
             <h3>${escapeHtml(name)}</h3>
             <p>${escapeHtml(shortDesc)}</p>
-            <div class="project-tags">
-                ${repo.language ? `<span class="tag">${escapeHtml(repo.language)}</span>` : ""}
-                ${repo.topics ? repo.topics.slice(0, 2).map(topic =>
-                    `<span class="tag">${escapeHtml(topic)}</span>`
-                ).join("") : ""}
+            <div class="project-meta">
+             <div class="project-tags">
+                ${
+                    repo.language
+                        ? `<span class="tag">${escapeHtml(
+                              repo.language
+                          )}</span>`
+                        : ""
+                }
+                ${
+                    repo.topics
+                        ? repo.topics
+                              .slice(0, 2)
+                              .map(
+                                  (topic) =>
+                                      `<span class="tag">${escapeHtml(
+                                          topic
+                                      )}</span>`
+                              )
+                              .join("")
+                        : ""
+                }
             </div>
             <div class="project-stats">
-                <span><i class="fas fa-star"></i> ${repo.stargazers_count}</span>
-                <span><i class="fas fa-code-branch"></i> ${repo.forks_count}</span>
-                ${repo.homepage ? '<span><i class="fas fa-link"></i> Live</span>' : ""}
+                <span><i class="fas fa-star"></i> ${
+                    repo.stargazers_count
+                }</span>
+                <span><i class="fas fa-code-branch"></i> ${
+                    repo.forks_count
+                }</span>
+                ${
+                    repo.homepage
+                        ? '<span><i class="fas fa-link"></i> Live</span>'
+                        : ""
+                }
             </div>
+            </div>
+
+        </div>
+
         </div>
     `;
 
@@ -341,7 +414,7 @@ function formatRepoName(name) {
     return name
         .replace(/[-_]/g, " ")
         .split(" ")
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(" ");
 }
 
@@ -363,7 +436,7 @@ function getLanguageColor(lang) {
         Vue: "#41b883",
         React: "#61dafb",
         Swift: "#ffac45",
-        Kotlin: "#F18E33"
+        Kotlin: "#F18E33",
     };
     return colors[lang] || "#6366f1";
 }
@@ -393,96 +466,57 @@ function animateCounter(element, target) {
     }, stepTime);
 }
 
-// ========== PROJECT SLIDER ==========
-let currentSlide = 0;
-let slider, prevBtn, nextBtn, dots, cards;
-let autoPlayInterval;
+// ========== PROJECT SLIDER WITH SLICK ==========
+function initSlickSlider() {
+    const $slider = $("#projectsSlider");
 
-function initSlider() {
-    slider = document.getElementById("projectsSlider");
-    prevBtn = document.getElementById("prevBtn");
-    nextBtn = document.getElementById("nextBtn");
-    dots = document.querySelectorAll(".dot");
-    cards = document.querySelectorAll(".project-card");
-
-    if (!slider || !prevBtn || !nextBtn || cards.length === 0) return;
-
-    prevBtn.onclick = () => {
-        if (currentSlide > 0) goToSlide(currentSlide - 1);
-        resetAutoPlay();
-    };
-
-    nextBtn.onclick = () => {
-        if (currentSlide < cards.length - 1) goToSlide(currentSlide + 1);
-        resetAutoPlay();
-    };
-
-    // Touch/swipe support
-    let touchStartX = 0;
-    let touchEndX = 0;
-
-    slider.addEventListener("touchstart", (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-    });
-
-    slider.addEventListener("touchend", (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    });
-
-    function handleSwipe() {
-        const diff = touchStartX - touchEndX;
-        if (Math.abs(diff) > 50) {
-            if (diff > 0 && currentSlide < cards.length - 1) {
-                goToSlide(currentSlide + 1);
-            } else if (diff < 0 && currentSlide > 0) {
-                goToSlide(currentSlide - 1);
-            }
-            resetAutoPlay();
-        }
+    // Destroy existing slider if it exists
+    if ($slider.hasClass("slick-initialized")) {
+        $slider.slick("unslick");
     }
 
-    startAutoPlay();
-    slider.addEventListener("mouseenter", stopAutoPlay);
-    slider.addEventListener("mouseleave", startAutoPlay);
-}
-
-function goToSlide(index) {
-    currentSlide = index;
-    const cardWidth = cards[0].offsetWidth + 30;
-    slider.scrollTo({
-        left: cardWidth * index,
-        behavior: "smooth"
+    // Initialize Slick Slider
+    $slider.slick({
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        autoplay: false,
+        autoplaySpeed: 4000,
+        pauseOnHover: true,
+        pauseOnFocus: true,
+        arrows: true,
+        prevArrow:
+            '<button type="button" class="slick-prev"><i class="fas fa-chevron-left"></i></button>',
+        nextArrow:
+            '<button type="button" class="slick-next"><i class="fas fa-chevron-right"></i></button>',
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1,
+                },
+            },
+            {
+                breakpoint: 768,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    arrows: true,
+                },
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    arrows: false,
+                },
+            },
+        ],
     });
-    updateDots();
-}
-
-function updateDots() {
-    dots.forEach((dot, i) => {
-        dot.classList.toggle("active", i === currentSlide);
-    });
-}
-
-function startAutoPlay() {
-    stopAutoPlay();
-    autoPlayInterval = setInterval(() => {
-        if (cards && cards.length > 0) {
-            const nextSlide = currentSlide < cards.length - 1 ? currentSlide + 1 : 0;
-            goToSlide(nextSlide);
-        }
-    }, 5000);
-}
-
-function stopAutoPlay() {
-    if (autoPlayInterval) {
-        clearInterval(autoPlayInterval);
-        autoPlayInterval = null;
-    }
-}
-
-function resetAutoPlay() {
-    stopAutoPlay();
-    startAutoPlay();
 }
 
 // ========== SKILLS DATA ==========
@@ -494,7 +528,7 @@ const SKILLS = [
     { name: "WordPress", icon: "fab fa-wordpress", progress: 90 },
     { name: "PHP", icon: "fab fa-php", progress: 82 },
     { name: "Git", icon: "fab fa-git-alt", progress: 87 },
-    { name: "Node.js", icon: "fab fa-node", progress: 78 }
+    { name: "Node.js", icon: "fab fa-node", progress: 78 },
 ];
 
 function renderSkills() {
@@ -523,6 +557,14 @@ function renderSkills() {
     });
 }
 
+function animateSkillBars() {
+    const skillBars = document.querySelectorAll(".skill-progress");
+    skillBars.forEach((bar) => {
+        const progress = bar.getAttribute("data-progress");
+        bar.style.width = progress + "%";
+    });
+}
+
 // ========== NAVIGATION ==========
 const navbar = document.getElementById("navbar");
 const navLinks = document.querySelectorAll(".nav-link");
@@ -539,14 +581,14 @@ window.addEventListener("scroll", () => {
 
     // Active nav link
     let current = "";
-    document.querySelectorAll("section").forEach(section => {
+    document.querySelectorAll("section").forEach((section) => {
         const sectionTop = section.offsetTop;
         if (window.scrollY >= sectionTop - 100) {
             current = section.getAttribute("id");
         }
     });
 
-    navLinks.forEach(link => {
+    navLinks.forEach((link) => {
         link.classList.remove("active");
         if (link.getAttribute("href").slice(1) === current) {
             link.classList.add("active");
@@ -561,7 +603,7 @@ if (mobileToggle && navLinksContainer) {
         navLinksContainer.classList.toggle("active");
     };
 
-    navLinks.forEach(link => {
+    navLinks.forEach((link) => {
         link.onclick = () => {
             mobileToggle.classList.remove("active");
             navLinksContainer.classList.remove("active");
@@ -570,8 +612,151 @@ if (mobileToggle && navLinksContainer) {
 }
 
 // ========== THEME TOGGLE ==========
-const themeToggle = document.getElementById("themeToggle");
-themeToggle.onclick = () => {
-    document.body.classList.toggle("dark-theme");
-    themeToggle.classList.toggle("active");
-};
+// const themeToggle = document.getElementById("themeToggle");
+// const savedTheme = localStorage.getItem("theme");
+
+// if (savedTheme === "light") {
+//     document.body.setAttribute("data-theme", "light");
+//     themeToggle.classList.add("active");
+//     themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+// }
+
+// themeToggle.onclick = () => {
+//     const currentTheme = document.body.getAttribute("data-theme");
+
+//     if (currentTheme === "light") {
+//         document.body.removeAttribute("data-theme");
+//         themeToggle.classList.remove("active");
+//         themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+//         localStorage.setItem("theme", "dark");
+//     } else {
+//         document.body.setAttribute("data-theme", "light");
+//         themeToggle.classList.add("active");
+//         themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+//         localStorage.setItem("theme", "light");
+//     }
+// };
+
+// ========== SCROLL ANIMATIONS ==========
+function initScrollAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -100px 0px",
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("aos-animate");
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll("[data-aos]").forEach((el) => {
+        observer.observe(el);
+    });
+}
+
+// ========== CONTACT FORM ==========
+function initContactForm() {
+    const form = document.getElementById("contactForm");
+
+    if (form) {
+        form.addEventListener("submit", handleContactSubmit);
+    }
+}
+
+function handleContactSubmit(e) {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+
+    // Show loading state
+    const submitBtn = e.target.querySelector(".btn-submit");
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML =
+        '<span>Sending...</span><i class="fas fa-spinner fa-spin"></i>';
+    submitBtn.disabled = true;
+
+    // Simulate form submission (replace with actual API call)
+    setTimeout(() => {
+        // Hide form and show success message
+        document.getElementById("contactForm").style.display = "none";
+        document.getElementById("formSuccess").classList.add("show");
+
+        // Reset button
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+
+        // Log form data (replace with actual submission)
+        console.log("Form submitted:", data);
+
+        // You can add actual form submission here:
+        // Example with mailto:
+        const mailtoLink = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+            data.subject
+        )}&body=${encodeURIComponent(
+            `Name: ${data.name}\nEmail: ${data.email}\n\nMessage:\n${data.message}`
+        )}`;
+        window.location.href = mailtoLink;
+    }, 1500);
+}
+
+function resetContactForm() {
+    document.getElementById("contactForm").style.display = "block";
+    document.getElementById("formSuccess").classList.remove("show");
+    document.getElementById("contactForm").reset();
+}
+
+// ========== SMOOTH SCROLL ==========
+document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener("click", function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute("href"));
+
+        if (target) {
+            target.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+        }
+    });
+});
+
+// ========== PERFORMANCE OPTIMIZATION ==========
+// Debounce function for scroll events
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Apply debounce to resize events
+window.addEventListener(
+    "resize",
+    debounce(() => {
+        // Slick handles responsive resizing automatically
+        const $slider = $("#projectsSlider");
+        if ($slider.hasClass("slick-initialized")) {
+            $slider.slick("setPosition");
+        }
+    }, 250)
+);
+
+// ========== ERROR HANDLING ==========
+window.addEventListener("error", (e) => {
+    console.error("Global error:", e.error);
+});
+
+window.addEventListener("unhandledrejection", (e) => {
+    console.error("Unhandled promise rejection:", e.reason);
+});
+
+console.log("Portfolio initialized successfully!");
