@@ -4,10 +4,20 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Md Saddam Hossan - Full Stack Developer</title>
+        <meta
+            name="description"
+            content="Portfolio of Md Saddam Hossan - Full Stack & WordPress Developer specializing in modern web applications"
+        />
         <link rel="stylesheet" href="style.css" />
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+            rel="stylesheet"
         />
     </head>
     <body>
@@ -16,6 +26,7 @@
             <div class="gradient-orb orb-1"></div>
             <div class="gradient-orb orb-2"></div>
             <div class="gradient-orb orb-3"></div>
+            <canvas id="particleCanvas"></canvas>
         </div>
 
         <!-- Navigation -->
@@ -23,22 +34,47 @@
             <div class="container">
                 <div class="nav-content">
                     <a href="#home" class="logo">
-                        <span class="logo-text"
-                            >Full Stack & WordPress Developer</span
-                        >
+                        <img
+                            src=""
+                            alt="Avatar"
+                            id="navAvatar"
+                            class="nav-avatar"
+                        />
+                        <div class="logo-text-wrapper">
+                            <span class="logo-text" id="navName"
+                                >Md Saddam Hossan</span
+                            >
+                            <span class="logo-subtitle"
+                                >Full Stack Developer</span
+                            >
+                        </div>
                     </a>
                     <div class="nav-links" id="navLinks">
                         <a href="#home" class="nav-link active">Home</a>
                         <a href="#about" class="nav-link">About</a>
                         <a href="#skills" class="nav-link">Skills</a>
                         <a href="#projects" class="nav-link">Projects</a>
+                        <a href="#blog" class="nav-link">Blog</a>
                         <a href="#contact" class="nav-link">Contact</a>
                     </div>
-                    <button class="mobile-toggle" id="mobileToggle">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
+                    <div class="nav-actions">
+                        <button
+                            class="theme-toggle"
+                            id="themeToggle"
+                            aria-label="Toggle theme"
+                        >
+                            <i class="fas fa-moon"></i>
+                        </button>
+                        <button
+                            class="mobile-toggle"
+                            id="mobileToggle"
+                            aria-label="Toggle menu"
+                        >
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -48,59 +84,126 @@
             <div class="container">
                 <div class="hero-content">
                     <div class="hero-text" data-aos="fade-right">
+                        <p class="hero-greeting">👋 Hello, I'm</p>
                         <h1 class="hero-title">
-                            Hi, I'm
-                            <span class="gradient-text" id="githubName"
+                            <span class="gradient-text" id="heroName"
                                 >Md Saddam Hossan</span
                             >
                         </h1>
                         <h2 class="hero-subtitle">
-                            Full Stack & WordPress Developer
+                            <span class="typing-text" id="typingText"></span>
+                            <span class="cursor">|</span>
                         </h2>
-                        <p class="hero-description" id="githubBio">
+                        <p class="hero-description" id="heroBio">
                             Passionate developer with 5+ years of experience
                             crafting modern web applications and custom
-                            websites. Specialized in WordPress solutions,
-                            integrating OpraSync Systems, and designing digital
-                            experiences.
+                            websites.
                         </p>
+
                         <div class="hero-stats">
-                            <div class="stat-item">
-                                <span class="stat-number" id="yearsExp"
-                                    >5+</span
-                                >
-                                <span class="stat-label">Years Experience</span>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-code"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-number" id="reposCount"
+                                        >0</span
+                                    >
+                                    <span class="stat-label">Repositories</span>
+                                </div>
                             </div>
-                            <div class="stat-item">
-                                <span class="stat-number" id="totalRepos"
-                                    >0</span
-                                >
-                                <span class="stat-label">Public Repos</span>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span
+                                        class="stat-number"
+                                        id="followersCount"
+                                        >0</span
+                                    >
+                                    <span class="stat-label">Followers</span>
+                                </div>
                             </div>
-                            <div class="stat-item">
-                                <span class="stat-number" id="githubFollowers"
-                                    >0</span
-                                >
-                                <span class="stat-label">Followers</span>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-number" id="starsCount"
+                                        >0</span
+                                    >
+                                    <span class="stat-label">Stars Earned</span>
+                                </div>
                             </div>
                         </div>
+
                         <div class="hero-buttons">
                             <a href="#projects" class="btn btn-primary">
-                                View Projects
+                                <span>View Projects</span>
                                 <i class="fas fa-arrow-right"></i>
                             </a>
                             <a href="#contact" class="btn btn-secondary">
-                                Get In Touch
+                                <span>Hire Me</span>
                                 <i class="fas fa-envelope"></i>
                             </a>
                         </div>
+
+                        <div class="social-links">
+                            <a
+                                href=""
+                                target="_blank"
+                                class="social-link"
+                                id="githubLink"
+                                title="GitHub"
+                            >
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a
+                                href="https://linkedin.com/in/your-profile"
+                                target="_blank"
+                                class="social-link"
+                                title="LinkedIn"
+                            >
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a
+                                href="https://wa.me/your-number"
+                                target="_blank"
+                                class="social-link"
+                                title="WhatsApp"
+                            >
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                            <a
+                                href="https://facebook.com/your-profile"
+                                target="_blank"
+                                class="social-link"
+                                title="Facebook"
+                            >
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                        </div>
                     </div>
+
                     <div class="hero-image" data-aos="fade-left">
                         <div class="image-wrapper">
+                            <div class="floating-card card-1">
+                                <i class="fas fa-code"></i>
+                                <span>Clean Code</span>
+                            </div>
+                            <div class="floating-card card-2">
+                                <i class="fas fa-mobile-alt"></i>
+                                <span>Responsive</span>
+                            </div>
+                            <div class="floating-card card-3">
+                                <i class="fas fa-rocket"></i>
+                                <span>Fast</span>
+                            </div>
                             <img
-                                id="profileImage"
-                                src="https://github.com/saddamhosan1.png"
-                                alt="Md Saddam Hossan"
+                                id="heroAvatar"
+                                src=""
+                                alt="Profile"
                                 class="profile-img"
                             />
                             <div class="image-decoration"></div>
@@ -113,155 +216,137 @@
         <!-- About Section -->
         <section class="about-section" id="about">
             <div class="container">
-                <h2 class="section-title" data-aos="fade-up">About Me</h2>
+                <h2 class="section-title" data-aos="fade-up">
+                    <span class="title-number">01.</span>
+                    About Me
+                    <div class="title-line"></div>
+                </h2>
+
                 <div class="about-content">
-                    <div class="about-left" data-aos="fade-right">
-                        <div class="about-image-card">
-                            <img
-                                id="aboutProfileImage"
-                                src="https://github.com/saddamhosan1.png"
-                                alt="Md Saddam Hossan"
-                                class="about-profile-img"
-                            />
-                            <div class="about-image-decoration"></div>
+                    <div class="about-text" data-aos="fade-right">
+                        <p class="about-description" id="aboutBio">
+                            I'm a passionate
+                            <strong>Full Stack & WordPress Developer</strong>
+                            with over 5 years of experience building modern web
+                            applications and custom website solutions. I
+                            specialize in creating scalable, maintainable code
+                            and delivering pixel-perfect designs that work
+                            seamlessly across all devices.
+                        </p>
+
+                        <div class="about-highlights">
+                            <div class="highlight-item">
+                                <div class="highlight-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="highlight-content">
+                                    <h4>Location</h4>
+                                    <p id="aboutLocation">
+                                        Thakurgaon, Bangladesh
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="highlight-item">
+                                <div class="highlight-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="highlight-content">
+                                    <h4>Email</h4>
+                                    <p>
+                                        <a
+                                            href="mailto:saddamhossan.tkg@gmail.com"
+                                            id="aboutEmail"
+                                            >saddamhossan.tkg@gmail.com</a
+                                        >
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="highlight-item">
+                                <div class="highlight-icon">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                                <div class="highlight-content">
+                                    <h4>Experience</h4>
+                                    <p>5+ Years in Web Development</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="github-stats-card">
-                            <h3>GitHub Stats</h3>
-                            <div class="github-stat-item">
-                                <i class="fab fa-github"></i>
-                                <div>
-                                    <span class="stat-value" id="totalCommits"
-                                        >Loading...</span
-                                    >
-                                    <span class="stat-name"
-                                        >Total Repositories</span
-                                    >
+
+                        <div class="certifications" data-aos="fade-up">
+                            <h3>Achievements & Certifications</h3>
+                            <div class="cert-list">
+                                <div class="cert-item">
+                                    <i class="fas fa-award"></i>
+                                    <span>WordPress Expert Certification</span>
                                 </div>
-                            </div>
-                            <div class="github-stat-item">
-                                <i class="fas fa-users"></i>
-                                <div>
-                                    <span class="stat-value" id="followersCount"
-                                        >Loading...</span
-                                    >
-                                    <span class="stat-name">Followers</span>
+                                <div class="cert-item">
+                                    <i class="fas fa-award"></i>
+                                    <span>React.js Advanced Developer</span>
                                 </div>
-                            </div>
-                            <div class="github-stat-item">
-                                <i class="fas fa-user-friends"></i>
-                                <div>
-                                    <span class="stat-value" id="followingCount"
-                                        >Loading...</span
-                                    >
-                                    <span class="stat-name">Following</span>
+                                <div class="cert-item">
+                                    <i class="fas fa-award"></i>
+                                    <span>Full Stack Web Development</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="about-right" data-aos="fade-left">
-                        <div class="about-text">
-                            <p class="about-description">
-                                I'm a passionate
-                                <strong
-                                    >Full Stack & WordPress Developer</strong
-                                >
-                                with over 5 years of experience in building
-                                modern web applications and custom website
-                                solutions. Currently working at
-                                <strong>CrativeWeb</strong>, I specialize in
-                                integrating OpraSync Systems and designing
-                                digital experiences that make an impact.
-                            </p>
-                            <p class="about-description">
-                                My expertise lies in creating scalable,
-                                maintainable code and delivering pixel-perfect
-                                designs that work seamlessly across all devices.
-                                I'm constantly learning and staying updated with
-                                the latest web technologies to provide the best
-                                solutions for my clients.
-                            </p>
-                        </div>
-                        <div class="about-highlights">
-                            <div class="highlight-item">
-                                <div class="highlight-icon">
-                                    <i class="fas fa-code"></i>
-                                </div>
-                                <div>
-                                    <h4>Clean Code</h4>
-                                    <p>
-                                        Writing maintainable and scalable code
-                                        following best practices
-                                    </p>
+
+                    <div class="about-visual" data-aos="fade-left">
+                        <div class="skills-preview">
+                            <div
+                                class="skill-circle"
+                                style="--progress: 95; --color: #e34c26"
+                            >
+                                <svg viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45"></circle>
+                                    <circle
+                                        cx="50"
+                                        cy="50"
+                                        r="45"
+                                        class="progress"
+                                    ></circle>
+                                </svg>
+                                <div class="skill-circle-content">
+                                    <i class="fab fa-html5"></i>
+                                    <span>95%</span>
                                 </div>
                             </div>
-                            <div class="highlight-item">
-                                <div class="highlight-icon">
-                                    <i class="fas fa-mobile-alt"></i>
-                                </div>
-                                <div>
-                                    <h4>Responsive Design</h4>
-                                    <p>
-                                        Creating seamless experiences across all
-                                        devices and screen sizes
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="highlight-item">
-                                <div class="highlight-icon">
-                                    <i class="fas fa-rocket"></i>
-                                </div>
-                                <div>
-                                    <h4>Performance</h4>
-                                    <p>
-                                        Optimizing for speed, efficiency, and
-                                        exceptional user experience
-                                    </p>
+                            <div
+                                class="skill-circle"
+                                style="--progress: 90; --color: #264de4"
+                            >
+                                <svg viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45"></circle>
+                                    <circle
+                                        cx="50"
+                                        cy="50"
+                                        r="45"
+                                        class="progress"
+                                    ></circle>
+                                </svg>
+                                <div class="skill-circle-content">
+                                    <i class="fab fa-css3-alt"></i>
+                                    <span>90%</span>
                                 </div>
                             </div>
-                            <div class="highlight-item">
-                                <div class="highlight-icon">
-                                    <i class="fas fa-shield-alt"></i>
-                                </div>
-                                <div>
-                                    <h4>Security</h4>
-                                    <p>
-                                        Implementing robust security measures
-                                        and following OWASP guidelines
-                                    </p>
+                            <div
+                                class="skill-circle"
+                                style="--progress: 88; --color: #f7df1e"
+                            >
+                                <svg viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45"></circle>
+                                    <circle
+                                        cx="50"
+                                        cy="50"
+                                        r="45"
+                                        class="progress"
+                                    ></circle>
+                                </svg>
+                                <div class="skill-circle-content">
+                                    <i class="fab fa-js"></i>
+                                    <span>88%</span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="specialties">
-                            <h3>What I Do</h3>
-                            <ul class="specialties-list">
-                                <li>
-                                    <i class="fas fa-check-circle"></i> Building
-                                    modern web applications with React &
-                                    JavaScript
-                                </li>
-                                <li>
-                                    <i class="fas fa-check-circle"></i>
-                                    Developing custom WordPress themes and
-                                    plugins
-                                </li>
-                                <li>
-                                    <i class="fas fa-check-circle"></i> Creating
-                                    responsive and accessible web designs
-                                </li>
-                                <li>
-                                    <i class="fas fa-check-circle"></i>
-                                    Integrating third-party APIs and services
-                                </li>
-                                <li>
-                                    <i class="fas fa-check-circle"></i>
-                                    E-commerce solutions with WooCommerce
-                                </li>
-                                <li>
-                                    <i class="fas fa-check-circle"></i>
-                                    Performance optimization and SEO
-                                    implementation
-                                </li>
-                            </ul>
                         </div>
                     </div>
                 </div>
@@ -271,104 +356,14 @@
         <!-- Skills Section -->
         <section class="skills-section" id="skills">
             <div class="container">
-                <h2 class="section-title" data-aos="fade-up">Tech Stack</h2>
-                <div class="skills-grid">
-                    <div
-                        class="skill-card"
-                        data-aos="zoom-in"
-                        data-aos-delay="100"
-                    >
-                        <div class="skill-icon">
-                            <i class="fab fa-html5"></i>
-                        </div>
-                        <h3>HTML5</h3>
-                        <div class="skill-bar">
-                            <div
-                                class="skill-progress"
-                                data-progress="95"
-                            ></div>
-                        </div>
-                    </div>
-                    <div
-                        class="skill-card"
-                        data-aos="zoom-in"
-                        data-aos-delay="150"
-                    >
-                        <div class="skill-icon">
-                            <i class="fab fa-css3-alt"></i>
-                        </div>
-                        <h3>CSS3</h3>
-                        <div class="skill-bar">
-                            <div
-                                class="skill-progress"
-                                data-progress="90"
-                            ></div>
-                        </div>
-                    </div>
-                    <div
-                        class="skill-card"
-                        data-aos="zoom-in"
-                        data-aos-delay="200"
-                    >
-                        <div class="skill-icon">
-                            <i class="fab fa-js"></i>
-                        </div>
-                        <h3>JavaScript</h3>
-                        <div class="skill-bar">
-                            <div
-                                class="skill-progress"
-                                data-progress="88"
-                            ></div>
-                        </div>
-                    </div>
-                    <div
-                        class="skill-card"
-                        data-aos="zoom-in"
-                        data-aos-delay="250"
-                    >
-                        <div class="skill-icon">
-                            <i class="fab fa-react"></i>
-                        </div>
-                        <h3>React</h3>
-                        <div class="skill-bar">
-                            <div
-                                class="skill-progress"
-                                data-progress="85"
-                            ></div>
-                        </div>
-                    </div>
-                    <div
-                        class="skill-card"
-                        data-aos="zoom-in"
-                        data-aos-delay="300"
-                    >
-                        <div class="skill-icon">
-                            <i class="fab fa-wordpress"></i>
-                        </div>
-                        <h3>WordPress</h3>
-                        <div class="skill-bar">
-                            <div
-                                class="skill-progress"
-                                data-progress="92"
-                            ></div>
-                        </div>
-                    </div>
-                    <div
-                        class="skill-card"
-                        data-aos="zoom-in"
-                        data-aos-delay="350"
-                    >
-                        <div class="skill-icon">
-                            <i class="fab fa-git-alt"></i>
-                        </div>
-                        <h3>Git</h3>
-                        <div class="skill-bar">
-                            <div
-                                class="skill-progress"
-                                data-progress="87"
-                            ></div>
-                        </div>
-                    </div>
+                <h2 class="section-title" data-aos="fade-up">
+                    <span class="title-number">02.</span>
+                    Skills & Expertise
+                    <div class="title-line"></div>
+                </h2>
+
+                <div class="skills-grid" id="skillsGrid">
+                    <!-- Skills populated by JS -->
                 </div>
             </div>
         </section>
@@ -377,35 +372,172 @@
         <section class="projects-section" id="projects">
             <div class="container">
                 <h2 class="section-title" data-aos="fade-up">
+                    <span class="title-number">03.</span>
                     Featured Projects
+                    <div class="title-line"></div>
                 </h2>
+
                 <div class="projects-loading" id="projectsLoading">
                     <div class="loader"></div>
                     <p>Loading projects from GitHub...</p>
                 </div>
+
                 <div
-                    class="projects-slider-container"
+                    class="projects-slider-wrapper"
                     id="projectsContainer"
                     style="display: none"
                 >
-                    <button class="slider-btn prev-btn" id="prevBtn">
+                    <button
+                        class="slider-nav prev"
+                        id="prevBtn"
+                        aria-label="Previous"
+                    >
                         <i class="fas fa-chevron-left"></i>
                     </button>
+
                     <div class="projects-slider" id="projectsSlider">
-                        <!-- Projects will be loaded dynamically -->
+                        <!-- Projects loaded dynamically -->
                     </div>
-                    <button class="slider-btn next-btn" id="nextBtn">
+
+                    <button
+                        class="slider-nav next"
+                        id="nextBtn"
+                        aria-label="Next"
+                    >
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
-                <div class="slider-dots" id="sliderDots"></div>
+
+                <div class="slider-pagination" id="sliderDots"></div>
+            </div>
+        </section>
+
+        <!-- Blog Section -->
+        <section class="blog-section" id="blog">
+            <div class="container">
+                <h2 class="section-title" data-aos="fade-up">
+                    <span class="title-number">04.</span>
+                    Latest Articles
+                    <div class="title-line"></div>
+                </h2>
+
+                <div class="blog-grid">
+                    <article
+                        class="blog-card"
+                        data-aos="fade-up"
+                        data-aos-delay="100"
+                    >
+                        <div class="blog-image">
+                            <img
+                                src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=500&fit=crop"
+                                alt="Blog post"
+                            />
+                            <div class="blog-category">Web Development</div>
+                        </div>
+                        <div class="blog-content">
+                            <div class="blog-meta">
+                                <span
+                                    ><i class="far fa-calendar"></i> Oct 25,
+                                    2025</span
+                                >
+                                <span
+                                    ><i class="far fa-clock"></i> 5 min
+                                    read</span
+                                >
+                            </div>
+                            <h3>Building Modern Web Applications with React</h3>
+                            <p>
+                                Learn the best practices for creating scalable
+                                React applications with modern tools and
+                                techniques.
+                            </p>
+                            <a href="#" class="blog-link">
+                                Read More <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article
+                        class="blog-card"
+                        data-aos="fade-up"
+                        data-aos-delay="200"
+                    >
+                        <div class="blog-image">
+                            <img
+                                src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=500&fit=crop"
+                                alt="Blog post"
+                            />
+                            <div class="blog-category">WordPress</div>
+                        </div>
+                        <div class="blog-content">
+                            <div class="blog-meta">
+                                <span
+                                    ><i class="far fa-calendar"></i> Oct 20,
+                                    2025</span
+                                >
+                                <span
+                                    ><i class="far fa-clock"></i> 8 min
+                                    read</span
+                                >
+                            </div>
+                            <h3>Custom WordPress Theme Development Guide</h3>
+                            <p>
+                                A comprehensive guide to creating custom
+                                WordPress themes from scratch with best
+                                practices.
+                            </p>
+                            <a href="#" class="blog-link">
+                                Read More <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article
+                        class="blog-card"
+                        data-aos="fade-up"
+                        data-aos-delay="300"
+                    >
+                        <div class="blog-image">
+                            <img
+                                src="https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=800&h=500&fit=crop"
+                                alt="Blog post"
+                            />
+                            <div class="blog-category">JavaScript</div>
+                        </div>
+                        <div class="blog-content">
+                            <div class="blog-meta">
+                                <span
+                                    ><i class="far fa-calendar"></i> Oct 15,
+                                    2025</span
+                                >
+                                <span
+                                    ><i class="far fa-clock"></i> 6 min
+                                    read</span
+                                >
+                            </div>
+                            <h3>Advanced JavaScript Patterns and Techniques</h3>
+                            <p>
+                                Explore advanced JavaScript patterns that will
+                                make your code more efficient and maintainable.
+                            </p>
+                            <a href="#" class="blog-link">
+                                Read More <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </article>
+                </div>
             </div>
         </section>
 
         <!-- Contact Section -->
         <section class="contact-section" id="contact">
             <div class="container">
-                <h2 class="section-title" data-aos="fade-up">Get In Touch</h2>
+                <h2 class="section-title" data-aos="fade-up">
+                    <span class="title-number">05.</span>
+                    Get In Touch
+                    <div class="title-line"></div>
+                </h2>
+
                 <div class="contact-content">
                     <div class="contact-info" data-aos="fade-right">
                         <h3>Let's Work Together</h3>
@@ -413,6 +545,7 @@
                             I'm always open to discussing new projects, creative
                             ideas, or opportunities to be part of your vision.
                         </p>
+
                         <div class="contact-details">
                             <div class="contact-item">
                                 <div class="contact-icon">
@@ -420,10 +553,8 @@
                                 </div>
                                 <div>
                                     <h4>Email</h4>
-                                    <a
-                                        href="mailto:goldenseoct54@gmail.com"
-                                        id="githubEmail"
-                                        >goldenseoct54@gmail.com</a
+                                    <a href="mailto:saddamhossan.tkg@gmail.com"
+                                        >saddamhossan.tkg@gmail.com</a
                                     >
                                 </div>
                             </div>
@@ -433,93 +564,129 @@
                                 </div>
                                 <div>
                                     <h4>Location</h4>
-                                    <p id="githubLocation">
-                                        Thakurgaon, Rangpur, Bangladesh
+                                    <p id="contactLocation">
+                                        Thakurgaon, Bangladesh
                                     </p>
                                 </div>
                             </div>
                             <div class="contact-item">
                                 <div class="contact-icon">
-                                    <i class="fab fa-github"></i>
+                                    <i class="fas fa-phone"></i>
                                 </div>
                                 <div>
-                                    <h4>GitHub</h4>
-                                    <a
-                                        href="https://github.com/saddamhosan1"
-                                        target="_blank"
-                                        id="githubUsername"
-                                        >@saddamhosan1</a
-                                    >
+                                    <h4>Phone</h4>
+                                    <p>Available on request</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="social-links">
-                            <a
-                                href="https://github.com/saddamhosan1"
-                                target="_blank"
-                                class="social-link"
-                                id="githubLink"
-                            >
-                                <i class="fab fa-github"></i>
-                            </a>
-                            <a
-                                href="mailto:goldenseoct54@gmail.com"
-                                class="social-link"
-                                id="emailLink"
-                            >
-                                <i class="fas fa-envelope"></i>
-                            </a>
+
+                        <div class="contact-social">
+                            <h4>Connect with me</h4>
+                            <div class="social-links-contact">
+                                <a href="" target="_blank" title="GitHub">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a
+                                    href="https://linkedin.com/in/your-profile"
+                                    target="_blank"
+                                    title="LinkedIn"
+                                >
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                                <a
+                                    href="https://wa.me/your-number"
+                                    target="_blank"
+                                    title="WhatsApp"
+                                >
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                                <a
+                                    href="https://facebook.com/your-profile"
+                                    target="_blank"
+                                    title="Facebook"
+                                >
+                                    <i class="fab fa-facebook"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
+
                     <div class="contact-form-wrapper" data-aos="fade-left">
                         <form class="contact-form" id="contactForm">
-                            <div class="form-group">
-                                <label for="name">Name</label>
-                                <input
-                                    type="text"
-                                    id="name"
-                                    name="name"
-                                    required
-                                />
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="name">
+                                        <i class="fas fa-user"></i>
+                                        Full Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="name"
+                                        name="name"
+                                        required
+                                        placeholder="John Doe"
+                                    />
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">
+                                        <i class="fas fa-envelope"></i>
+                                        Email Address
+                                    </label>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        required
+                                        placeholder="john@example.com"
+                                    />
+                                </div>
                             </div>
+
                             <div class="form-group">
-                                <label for="email">Email</label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    required
-                                />
-                            </div>
-                            <div class="form-group">
-                                <label for="subject">Subject</label>
+                                <label for="subject">
+                                    <i class="fas fa-tag"></i>
+                                    Subject
+                                </label>
                                 <input
                                     type="text"
                                     id="subject"
                                     name="subject"
                                     required
+                                    placeholder="Project Inquiry"
                                 />
                             </div>
+
                             <div class="form-group">
-                                <label for="message">Message</label>
+                                <label for="message">
+                                    <i class="fas fa-comment"></i>
+                                    Message
+                                </label>
                                 <textarea
                                     id="message"
                                     name="message"
-                                    rows="5"
+                                    rows="6"
                                     required
+                                    placeholder="Tell me about your project..."
                                 ></textarea>
                             </div>
-                            <button type="submit" class="btn btn-primary">
-                                Send Message
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary btn-submit"
+                            >
+                                <span>Send Message</span>
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </form>
+
                         <div class="form-success" id="formSuccess">
-                            <i class="fas fa-check-circle"></i>
-                            <h4>Message Sent Successfully!</h4>
+                            <div class="success-animation">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3>Message Sent Successfully!</h3>
                             <p>
                                 Thank you for reaching out. I'll get back to you
-                                soon.
+                                within 24 hours.
                             </p>
                         </div>
                     </div>
@@ -531,19 +698,27 @@
         <footer class="footer">
             <div class="container">
                 <div class="footer-content">
+                    <div class="footer-brand">
+                        <h3 id="footerName">Md Saddam Hossan</h3>
+                        <p>Full Stack & WordPress Developer</p>
+                    </div>
+                    <div class="footer-links">
+                        <a href="#home">Home</a>
+                        <a href="#about">About</a>
+                        <a href="#projects">Projects</a>
+                        <a href="#contact">Contact</a>
+                    </div>
+                </div>
+                <div class="footer-bottom">
                     <p>
-                        &copy; 2024
-                        <span id="footerName">Md Saddam Hossan</span>. All
-                        rights reserved.
-                    </p>
-                    <p>
-                        Built with <i class="fas fa-heart"></i> using HTML, CSS
-                        & JavaScript
+                        &copy; <span id="year">2025</span> Md Saddam Hossan.
+                        Built with <i class="fas fa-heart"></i> and creativity.
                     </p>
                 </div>
             </div>
         </footer>
 
+        <!-- Scripts -->
         <script src="custom.js"></script>
     </body>
 </html>
