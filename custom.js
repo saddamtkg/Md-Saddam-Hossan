@@ -53,7 +53,8 @@ function initializeApp() {
 const typingTexts = [
     "Full Stack Developer",
     "WordPress Expert",
-    "UI/UX Designer",
+    "Shopify Developer",
+    "Webflow Designer",
     "Problem Solver",
 ];
 
@@ -146,9 +147,8 @@ function initParticles() {
 
                 if (distance < 150) {
                     ctx.beginPath();
-                    ctx.strokeStyle = `rgba(99, 102, 241, ${
-                        0.2 - distance / 750
-                    })`;
+                    ctx.strokeStyle = `rgba(99, 102, 241, ${0.2 - distance / 750
+                        })`;
                     ctx.lineWidth = 0.5;
                     ctx.moveTo(particle.x, particle.y);
                     ctx.lineTo(particles[j].x, particles[j].y);
@@ -308,20 +308,18 @@ function createProjectCard(repo) {
     card.innerHTML = `
         <div class="project-image" style="background: linear-gradient(135deg, ${color}33 0%, ${color}11 100%);">
             <div class="project-overlay">
-                <a href="${
-                    repo.html_url
-                }" class="project-link" target="_blank" rel="noopener noreferrer" title="View on GitHub">
+                <a href="${repo.html_url
+        }" class="project-link" target="_blank" rel="noopener noreferrer" title="View on GitHub">
                 <i class="fab fa-github"></i>
                 </a>
-                ${
-                    repo.homepage
-                        ? `
+                ${repo.homepage
+            ? `
                     <a href="${repo.homepage}" class="project-link" target="_blank" rel="noopener noreferrer" title="Live Demo">
                         <i class="fas fa-external-link-alt"></i>
                     </a>
                 `
-                        : ""
-                }
+            : ""
+        }
                 <div class="project-title">
                     <a href="${repo.homepage || repo.html_url}"
                     target="_blank"
@@ -335,39 +333,34 @@ function createProjectCard(repo) {
             <p>${escapeHtml(shortDesc)}</p>
             <div class="project-meta">
              <div class="project-tags">
-                ${
-                    repo.language
-                        ? `<span class="tag">${escapeHtml(
-                              repo.language
-                          )}</span>`
-                        : ""
-                }
-                ${
-                    repo.topics
-                        ? repo.topics
-                              .slice(0, 2)
-                              .map(
-                                  (topic) =>
-                                      `<span class="tag">${escapeHtml(
-                                          topic
-                                      )}</span>`
-                              )
-                              .join("")
-                        : ""
-                }
+                ${repo.language
+            ? `<span class="tag">${escapeHtml(
+                repo.language
+            )}</span>`
+            : ""
+        }
+                ${repo.topics
+            ? repo.topics
+                .slice(0, 2)
+                .map(
+                    (topic) =>
+                        `<span class="tag">${escapeHtml(
+                            topic
+                        )}</span>`
+                )
+                .join("")
+            : ""
+        }
             </div>
             <div class="project-stats">
-                <span><i class="fas fa-star"></i> ${
-                    repo.stargazers_count
-                }</span>
-                <span><i class="fas fa-code-branch"></i> ${
-                    repo.forks_count
-                }</span>
-                ${
-                    repo.homepage
-                        ? '<span><i class="fas fa-link"></i> Live</span>'
-                        : ""
-                }
+                <span><i class="fas fa-star"></i> ${repo.stargazers_count
+        }</span>
+                <span><i class="fas fa-code-branch"></i> ${repo.forks_count
+        }</span>
+                ${repo.homepage
+            ? '<span><i class="fas fa-link"></i> Live</span>'
+            : ""
+        }
             </div>
             </div>
 
@@ -482,8 +475,8 @@ function initSlickSlider() {
         speed: 500,
         slidesToShow: 3,
         slidesToScroll: 1,
-        autoplay: false,
-        autoplaySpeed: 4000,
+        autoplay: true,
+        autoplaySpeed: 6000,
         pauseOnHover: true,
         pauseOnFocus: true,
         arrows: true,
@@ -612,30 +605,30 @@ if (mobileToggle && navLinksContainer) {
 }
 
 // ========== THEME TOGGLE ==========
-// const themeToggle = document.getElementById("themeToggle");
-// const savedTheme = localStorage.getItem("theme");
+const themeToggle = document.getElementById("themeToggle");
+const savedTheme = localStorage.getItem("theme");
 
-// if (savedTheme === "light") {
-//     document.body.setAttribute("data-theme", "light");
-//     themeToggle.classList.add("active");
-//     themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-// }
+if (savedTheme === "light") {
+    document.body.setAttribute("data-theme", "light");
+    themeToggle.classList.add("active");
+    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+}
 
-// themeToggle.onclick = () => {
-//     const currentTheme = document.body.getAttribute("data-theme");
+themeToggle.onclick = () => {
+    const currentTheme = document.body.getAttribute("data-theme");
 
-//     if (currentTheme === "light") {
-//         document.body.removeAttribute("data-theme");
-//         themeToggle.classList.remove("active");
-//         themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-//         localStorage.setItem("theme", "dark");
-//     } else {
-//         document.body.setAttribute("data-theme", "light");
-//         themeToggle.classList.add("active");
-//         themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-//         localStorage.setItem("theme", "light");
-//     }
-// };
+    if (currentTheme === "light") {
+        document.body.removeAttribute("data-theme");
+        themeToggle.classList.remove("active");
+        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        localStorage.setItem("theme", "dark");
+    } else {
+        document.body.setAttribute("data-theme", "light");
+        themeToggle.classList.add("active");
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        localStorage.setItem("theme", "light");
+    }
+};
 
 // ========== SCROLL ANIMATIONS ==========
 function initScrollAnimations() {

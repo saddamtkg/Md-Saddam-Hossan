@@ -730,6 +730,10 @@ section {
     font-size: 20px;
 }
 
+.footer-logo-wrapper img.footer-logo {
+    width: 250px;
+}
+
 /* Skills Preview Circles */
 .skills-preview {
     display: flex;
@@ -1469,11 +1473,17 @@ section {
 
 .footer-content {
     display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
     padding-bottom: 30px;
     border-bottom: 1px solid var(--border-color);
+}
+
+.footer-logo-wrapper img.footer-logo {
+    width: 250px;
 }
 
 .footer-brand h3 {
