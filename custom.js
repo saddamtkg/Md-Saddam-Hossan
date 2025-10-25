@@ -6,87 +6,176 @@ const GITHUB_REPOS_API = `https://api.github.com/users/${GITHUB_USERNAME}/repos?
 // Fetch GitHub User Data
 async function fetchGitHubData() {
     try {
+        console.log("Fetching GitHub user data...");
         const response = await fetch(GITHUB_API);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
+        console.log("GitHub data received:", data);
 
         // Update profile image
-        document.getElementById("profileImage").src = data.avatar_url;
-        document.getElementById("aboutProfileImage").src = data.avatar_url;
+        const profileImg = document.getElementById("profileImage");
+        const aboutProfileImg = document.getElementById("aboutProfileImage");
+
+        if (profileImg && data.avatar_url) {
+            profileImg.src = data.avatar_url;
+            profileImg.onerror = () => {
+                console.error("Error loading profile image");
+                profileImg.src =
+                    "https://via.placeholder.com/400x400?text=Profile";
+            };
+        }
+
+        if (aboutProfileImg && data.avatar_url) {
+            aboutProfileImg.src = data.avatar_url;
+            aboutProfileImg.onerror = () => {
+                console.error("Error loading about profile image");
+                aboutProfileImg.src =
+                    "https://via.placeholder.com/400x400?text=Profile";
+            };
+        }
 
         // Update name
         const displayName = data.name || GITHUB_USERNAME;
-        document.getElementById("githubName").textContent = displayName;
-        document.getElementById("footerName").textContent = displayName;
+        const nameElement = document.getElementById("githubName");
+        const footerNameElement = document.getElementById("footerName");
+
+        if (nameElement) nameElement.textContent = displayName;
+        if (footerNameElement) footerNameElement.textContent = displayName;
 
         // Update bio
-        if (data.bio) {
-            document.getElementById("githubBio").textContent = data.bio;
+        const bioElement = document.getElementById("githubBio");
+        if (bioElement && data.bio) {
+            bioElement.textContent = data.bio;
         }
 
-        // Update stats
-        document.getElementById("totalRepos").textContent = data.public_repos;
-        document.getElementById("githubFollowers").textContent = data.followers;
-        document.getElementById("totalCommits").textContent = data.public_repos;
-        document.getElementById("followersCount").textContent = data.followers;
-        document.getElementById("followingCount").textContent = data.following;
+        // Update stats with animation
+        const totalReposElement = document.getElementById("totalRepos");
+        const followersElement = document.getElementById("githubFollowers");
+        const commitsElement = document.getElementById("totalCommits");
+        const followersCountElement = document.getElementById("followersCount");
+        const followingCountElement = document.getElementById("followingCount");
+
+        if (totalReposElement) {
+            totalReposElement.textContent = data.public_repos || "0";
+            setTimeout(
+                () => animateCounter(totalReposElement, data.public_repos || 0),
+                500
+            );
+        }
+
+        if (followersElement) {
+            followersElement.textContent = data.followers || "0";
+            setTimeout(
+                () => animateCounter(followersElement, data.followers || 0),
+                700
+            );
+        }
+
+        if (commitsElement)
+            commitsElement.textContent = data.public_repos || "0";
+        if (followersCountElement)
+            followersCountElement.textContent = data.followers || "0";
+        if (followingCountElement)
+            followingCountElement.textContent = data.following || "0";
 
         // Update location
-        if (data.location) {
-            document.getElementById("githubLocation").textContent =
-                data.location;
+        const locationElement = document.getElementById("githubLocation");
+        if (locationElement && data.location) {
+            locationElement.textContent = data.location;
         }
 
         // Update email
+        const emailElement = document.getElementById("githubEmail");
+        const emailLinkElement = document.getElementById("emailLink");
+
         if (data.email) {
-            document.getElementById("githubEmail").textContent = data.email;
-            document.getElementById(
-                "githubEmail"
-            ).href = `mailto:${data.email}`;
-            document.getElementById("emailLink").href = `mailto:${data.email}`;
+            if (emailElement) {
+                emailElement.textContent = data.email;
+                emailElement.href = `mailto:${data.email}`;
+            }
+            if (emailLinkElement) {
+                emailLinkElement.href = `mailto:${data.email}`;
+            }
         }
 
         // Update GitHub links
-        document.getElementById(
-            "githubUsername"
-        ).textContent = `@${data.login}`;
-        document.getElementById("githubUsername").href = data.html_url;
-        document.getElementById("githubLink").href = data.html_url;
+        const usernameElement = document.getElementById("githubUsername");
+        const githubLinkElement = document.getElementById("githubLink");
 
-        // Animate counters
-        animateCounter(
-            document.getElementById("totalRepos"),
-            data.public_repos
-        );
-        animateCounter(
-            document.getElementById("githubFollowers"),
-            data.followers
-        );
+        if (usernameElement) {
+            usernameElement.textContent = `@${data.login}`;
+            usernameElement.href = data.html_url;
+        }
+        if (githubLinkElement) {
+            githubLinkElement.href = data.html_url;
+        }
+
+        console.log("GitHub user data updated successfully!");
     } catch (error) {
-        console.error("Error fetching GitHub data:", error);
+        console.error("Error fetching GitHub user data:", error);
+        // Set fallback values
+        const profileImg = document.getElementById("profileImage");
+        const aboutProfileImg = document.getElementById("aboutProfileImage");
+
+        if (profileImg) profileImg.src = "https://github.com/saddamhosan1.png";
+        if (aboutProfileImg)
+            aboutProfileImg.src = "https://github.com/saddamhosan1.png";
     }
 }
 
 // Fetch GitHub Repositories
 async function fetchGitHubRepos() {
+    const loadingElement = document.getElementById("projectsLoading");
+    const containerElement = document.getElementById("projectsContainer");
+
     try {
+        console.log("Fetching GitHub repositories...");
         const response = await fetch(GITHUB_REPOS_API);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const repos = await response.json();
+        console.log(`Fetched ${repos.length} repositories`);
 
         // Hide loading, show container
-        document.getElementById("projectsLoading").style.display = "none";
-        document.getElementById("projectsContainer").style.display = "block";
+        if (loadingElement) loadingElement.style.display = "none";
+        if (containerElement) containerElement.style.display = "block";
 
         // Filter out forks and sort by stars
         const filteredRepos = repos
             .filter((repo) => !repo.fork)
             .sort((a, b) => b.stargazers_count - a.stargazers_count);
 
-        displayProjects(filteredRepos);
+        console.log(`Displaying ${filteredRepos.length} repositories`);
+
+        if (filteredRepos.length > 0) {
+            displayProjects(filteredRepos);
+        } else {
+            if (loadingElement) {
+                loadingElement.style.display = "block";
+                loadingElement.innerHTML = `
+                    <p style="color: var(--text-muted);">No repositories found. Start creating amazing projects!</p>
+                `;
+            }
+        }
     } catch (error) {
         console.error("Error fetching repositories:", error);
-        document.getElementById("projectsLoading").innerHTML = `
-            <p style="color: var(--text-muted);">Unable to load projects. Please check back later.</p>
-        `;
+        if (loadingElement) {
+            loadingElement.style.display = "block";
+            loadingElement.innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #f59e0b; margin-bottom: 20px;"></i>
+                    <p style="color: var(--text-muted); margin-bottom: 15px;">Unable to load projects from GitHub.</p>
+                    <p style="color: var(--text-muted); font-size: 14px;">Please check your internet connection or try again later.</p>
+                </div>
+            `;
+        }
     }
 }
 
@@ -95,8 +184,15 @@ function displayProjects(repos) {
     const slider = document.getElementById("projectsSlider");
     const dotsContainer = document.getElementById("sliderDots");
 
+    if (!slider || !dotsContainer) {
+        console.error("Slider elements not found");
+        return;
+    }
+
     slider.innerHTML = "";
     dotsContainer.innerHTML = "";
+
+    console.log("Creating project cards...");
 
     repos.forEach((repo, index) => {
         // Create project card
@@ -105,6 +201,23 @@ function displayProjects(repos) {
 
         // Get language color
         const languageColor = getLanguageColor(repo.language);
+
+        // Format description
+        const description =
+            repo.description ||
+            "A great project built with passion and dedication.";
+        const truncatedDescription =
+            description.length > 120
+                ? description.substring(0, 120) + "..."
+                : description;
+
+        // Format repo name
+        const formattedName = repo.name
+            .replace(/-/g, " ")
+            .replace(/_/g, " ")
+            .split(" ")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ");
 
         card.innerHTML = `
             <div class="project-image" style="background: linear-gradient(135deg, ${languageColor}33 0%, ${languageColor}11 100%);">
@@ -126,23 +239,25 @@ function displayProjects(repos) {
                 </div>
             </div>
             <div class="project-content">
-                <h3>${repo.name
-                    .replace(/-/g, " ")
-                    .replace(/\b\w/g, (l) => l.toUpperCase())}</h3>
-                <p>${
-                    repo.description ||
-                    "A great project built with passion and dedication."
-                }</p>
+                <h3>${formattedName}</h3>
+                <p>${truncatedDescription}</p>
                 <div class="project-tags">
                     ${
                         repo.language
                             ? `<span class="tag">${repo.language}</span>`
                             : ""
                     }
-                    ${repo.topics
-                        .slice(0, 3)
-                        .map((topic) => `<span class="tag">${topic}</span>`)
-                        .join("")}
+                    ${
+                        repo.topics && repo.topics.length > 0
+                            ? repo.topics
+                                  .slice(0, 2)
+                                  .map(
+                                      (topic) =>
+                                          `<span class="tag">${topic}</span>`
+                                  )
+                                  .join("")
+                            : ""
+                    }
                 </div>
                 <div class="project-stats">
                     <span><i class="fas fa-star"></i> ${
@@ -153,7 +268,7 @@ function displayProjects(repos) {
                     }</span>
                     ${
                         repo.homepage
-                            ? '<span><i class="fas fa-link"></i> Live Demo</span>'
+                            ? '<span><i class="fas fa-link"></i> Live</span>'
                             : ""
                     }
                 </div>
@@ -170,8 +285,12 @@ function displayProjects(repos) {
         dotsContainer.appendChild(dot);
     });
 
-    // Initialize slider
-    initializeSlider();
+    console.log(`Created ${repos.length} project cards`);
+
+    // Initialize slider after a short delay to ensure DOM is ready
+    setTimeout(() => {
+        initializeSlider();
+    }, 100);
 }
 
 // Get language color
@@ -658,9 +777,32 @@ console.log(
 
 // Initialize on page load
 window.addEventListener("load", () => {
+    console.log("Portfolio initializing...");
+
+    // Start typing effect
     heroSubtitle.textContent = "";
     setTimeout(typeWriter, 500);
+
+    // Fetch GitHub data
     fetchGitHubData();
+
+    // Fetch repositories
     fetchGitHubRepos();
+
     console.log("Portfolio loaded successfully! ✨");
+});
+
+// Also try on DOMContentLoaded in case load event doesn't fire
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOM Content Loaded - initializing fallback...");
+
+    // If data hasn't loaded after 2 seconds, try again
+    setTimeout(() => {
+        const profileImg = document.getElementById("profileImage");
+        if (profileImg && profileImg.src.includes("saddamhosan1.png")) {
+            console.log("Attempting to reload GitHub data...");
+            fetchGitHubData();
+            fetchGitHubRepos();
+        }
+    }, 2000);
 });
