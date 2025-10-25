@@ -3,11 +3,36 @@ const GITHUB_USERNAME = "saddamhosan1";
 const GITHUB_API = `https://api.github.com/users/${GITHUB_USERNAME}`;
 const GITHUB_REPOS_API = `https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=100`;
 
-// Fetch GitHub User Data
+// Add fallback data in case API fails
+const FALLBACK_DATA = {
+    name: "Md Saddam Hossan",
+    bio: "Passionate developer with 5+ years of experience crafting modern web applications and custom websites. Specialized in WordPress solutions, integrating OpraSync Systems, and designing digital experiences.",
+    avatar_url: "https://github.com/saddamhosan1.png",
+    public_repos: 0,
+    followers: 0,
+    following: 0,
+    location: "Thakurgaon, Rangpur, Bangladesh",
+    email: "goldenseoct54@gmail.com",
+    login: "saddamhosan1",
+    html_url: "https://github.com/saddamhosan1",
+};
+
+// Fetch GitHub User Data with better error handling
 async function fetchGitHubData() {
     try {
         console.log("Fetching GitHub user data...");
-        const response = await fetch(GITHUB_API);
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+        const response = await fetch(GITHUB_API, {
+            signal: controller.signal,
+            headers: {
+                Accept: "application/vnd.github.v3+json",
+            },
+        });
+
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -16,125 +41,133 @@ async function fetchGitHubData() {
         const data = await response.json();
         console.log("GitHub data received:", data);
 
-        // Update profile image
-        const profileImg = document.getElementById("profileImage");
-        const aboutProfileImg = document.getElementById("aboutProfileImage");
-
-        if (profileImg && data.avatar_url) {
-            profileImg.src = data.avatar_url;
-            profileImg.onerror = () => {
-                console.error("Error loading profile image");
-                profileImg.src =
-                    "https://via.placeholder.com/400x400?text=Profile";
-            };
-        }
-
-        if (aboutProfileImg && data.avatar_url) {
-            aboutProfileImg.src = data.avatar_url;
-            aboutProfileImg.onerror = () => {
-                console.error("Error loading about profile image");
-                aboutProfileImg.src =
-                    "https://via.placeholder.com/400x400?text=Profile";
-            };
-        }
-
-        // Update name
-        const displayName = data.name || GITHUB_USERNAME;
-        const nameElement = document.getElementById("githubName");
-        const footerNameElement = document.getElementById("footerName");
-
-        if (nameElement) nameElement.textContent = displayName;
-        if (footerNameElement) footerNameElement.textContent = displayName;
-
-        // Update bio
-        const bioElement = document.getElementById("githubBio");
-        if (bioElement && data.bio) {
-            bioElement.textContent = data.bio;
-        }
-
-        // Update stats with animation
-        const totalReposElement = document.getElementById("totalRepos");
-        const followersElement = document.getElementById("githubFollowers");
-        const commitsElement = document.getElementById("totalCommits");
-        const followersCountElement = document.getElementById("followersCount");
-        const followingCountElement = document.getElementById("followingCount");
-
-        if (totalReposElement) {
-            totalReposElement.textContent = data.public_repos || "0";
-            setTimeout(
-                () => animateCounter(totalReposElement, data.public_repos || 0),
-                500
-            );
-        }
-
-        if (followersElement) {
-            followersElement.textContent = data.followers || "0";
-            setTimeout(
-                () => animateCounter(followersElement, data.followers || 0),
-                700
-            );
-        }
-
-        if (commitsElement)
-            commitsElement.textContent = data.public_repos || "0";
-        if (followersCountElement)
-            followersCountElement.textContent = data.followers || "0";
-        if (followingCountElement)
-            followingCountElement.textContent = data.following || "0";
-
-        // Update location
-        const locationElement = document.getElementById("githubLocation");
-        if (locationElement && data.location) {
-            locationElement.textContent = data.location;
-        }
-
-        // Update email
-        const emailElement = document.getElementById("githubEmail");
-        const emailLinkElement = document.getElementById("emailLink");
-
-        if (data.email) {
-            if (emailElement) {
-                emailElement.textContent = data.email;
-                emailElement.href = `mailto:${data.email}`;
-            }
-            if (emailLinkElement) {
-                emailLinkElement.href = `mailto:${data.email}`;
-            }
-        }
-
-        // Update GitHub links
-        const usernameElement = document.getElementById("githubUsername");
-        const githubLinkElement = document.getElementById("githubLink");
-
-        if (usernameElement) {
-            usernameElement.textContent = `@${data.login}`;
-            usernameElement.href = data.html_url;
-        }
-        if (githubLinkElement) {
-            githubLinkElement.href = data.html_url;
-        }
-
+        updateUIWithData(data);
         console.log("GitHub user data updated successfully!");
     } catch (error) {
         console.error("Error fetching GitHub user data:", error);
-        // Set fallback values
-        const profileImg = document.getElementById("profileImage");
-        const aboutProfileImg = document.getElementById("aboutProfileImage");
-
-        if (profileImg) profileImg.src = "https://github.com/saddamhosan1.png";
-        if (aboutProfileImg)
-            aboutProfileImg.src = "https://github.com/saddamhosan1.png";
+        console.log("Using fallback data...");
+        updateUIWithData(FALLBACK_DATA);
     }
 }
 
-// Fetch GitHub Repositories
+// Separate function to update UI with data
+function updateUIWithData(data) {
+    // Update profile images
+    const profileImg = document.getElementById("profileImage");
+    const aboutProfileImg = document.getElementById("aboutProfileImage");
+
+    if (profileImg && data.avatar_url) {
+        profileImg.src = data.avatar_url;
+        profileImg.onerror = () => {
+            console.error("Error loading profile image");
+            profileImg.src = "https://via.placeholder.com/400x400?text=Profile";
+        };
+    }
+
+    if (aboutProfileImg && data.avatar_url) {
+        aboutProfileImg.src = data.avatar_url;
+        aboutProfileImg.onerror = () => {
+            console.error("Error loading about profile image");
+            aboutProfileImg.src =
+                "https://via.placeholder.com/400x400?text=Profile";
+        };
+    }
+
+    // Update name
+    const displayName = data.name || GITHUB_USERNAME;
+    const nameElement = document.getElementById("githubName");
+    const footerNameElement = document.getElementById("footerName");
+
+    if (nameElement) nameElement.textContent = displayName;
+    if (footerNameElement) footerNameElement.textContent = displayName;
+
+    // Update bio
+    const bioElement = document.getElementById("githubBio");
+    if (bioElement && data.bio) {
+        bioElement.textContent = data.bio;
+    }
+
+    // Update stats with animation
+    const totalReposElement = document.getElementById("totalRepos");
+    const followersElement = document.getElementById("githubFollowers");
+    const commitsElement = document.getElementById("totalCommits");
+    const followersCountElement = document.getElementById("followersCount");
+    const followingCountElement = document.getElementById("followingCount");
+
+    if (totalReposElement) {
+        totalReposElement.textContent = data.public_repos || "0";
+        setTimeout(
+            () => animateCounter(totalReposElement, data.public_repos || 0),
+            500
+        );
+    }
+
+    if (followersElement) {
+        followersElement.textContent = data.followers || "0";
+        setTimeout(
+            () => animateCounter(followersElement, data.followers || 0),
+            700
+        );
+    }
+
+    if (commitsElement) commitsElement.textContent = data.public_repos || "0";
+    if (followersCountElement)
+        followersCountElement.textContent = data.followers || "0";
+    if (followingCountElement)
+        followingCountElement.textContent = data.following || "0";
+
+    // Update location
+    const locationElement = document.getElementById("githubLocation");
+    if (locationElement && data.location) {
+        locationElement.textContent = data.location;
+    }
+
+    // Update email
+    const emailElement = document.getElementById("githubEmail");
+    const emailLinkElement = document.getElementById("emailLink");
+
+    if (data.email) {
+        if (emailElement) {
+            emailElement.textContent = data.email;
+            emailElement.href = `mailto:${data.email}`;
+        }
+        if (emailLinkElement) {
+            emailLinkElement.href = `mailto:${data.email}`;
+        }
+    }
+
+    // Update GitHub links
+    const usernameElement = document.getElementById("githubUsername");
+    const githubLinkElement = document.getElementById("githubLink");
+
+    if (usernameElement) {
+        usernameElement.textContent = `@${data.login}`;
+        usernameElement.href = data.html_url;
+    }
+    if (githubLinkElement) {
+        githubLinkElement.href = data.html_url;
+    }
+}
+
+// Fetch GitHub Repositories with better error handling
 async function fetchGitHubRepos() {
     const loadingElement = document.getElementById("projectsLoading");
     const containerElement = document.getElementById("projectsContainer");
 
     try {
         console.log("Fetching GitHub repositories...");
-        const response = await fetch(GITHUB_REPOS_API);
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+        const response = await fetch(GITHUB_REPOS_API, {
+            signal: controller.signal,
+            headers: {
+                Accept: "application/vnd.github.v3+json",
+            },
+        });
+
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -173,6 +206,9 @@ async function fetchGitHubRepos() {
                     <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #f59e0b; margin-bottom: 20px;"></i>
                     <p style="color: var(--text-muted); margin-bottom: 15px;">Unable to load projects from GitHub.</p>
                     <p style="color: var(--text-muted); font-size: 14px;">Please check your internet connection or try again later.</p>
+                    <button onclick="fetchGitHubRepos()" class="btn btn-primary" style="margin-top: 20px;">
+                        Retry <i class="fas fa-redo"></i>
+                    </button>
                 </div>
             `;
         }
@@ -287,7 +323,7 @@ function displayProjects(repos) {
 
     console.log(`Created ${repos.length} project cards`);
 
-    // Initialize slider after a short delay to ensure DOM is ready
+    // Initialize slider after a short delay
     setTimeout(() => {
         initializeSlider();
     }, 100);
@@ -369,18 +405,20 @@ window.addEventListener("scroll", () => {
 const mobileToggle = document.getElementById("mobileToggle");
 const navLinksContainer = document.getElementById("navLinks");
 
-mobileToggle.addEventListener("click", () => {
-    mobileToggle.classList.toggle("active");
-    navLinksContainer.classList.toggle("active");
-});
-
-// Close mobile menu when clicking on a link
-navLinks.forEach((link) => {
-    link.addEventListener("click", () => {
-        mobileToggle.classList.remove("active");
-        navLinksContainer.classList.remove("active");
+if (mobileToggle && navLinksContainer) {
+    mobileToggle.addEventListener("click", () => {
+        mobileToggle.classList.toggle("active");
+        navLinksContainer.classList.toggle("active");
     });
-});
+
+    // Close mobile menu when clicking on a link
+    navLinks.forEach((link) => {
+        link.addEventListener("click", () => {
+            mobileToggle.classList.remove("active");
+            navLinksContainer.classList.remove("active");
+        });
+    });
+}
 
 // Intersection Observer for Animations
 const observerOptions = {
@@ -397,9 +435,11 @@ const observer = new IntersectionObserver((entries) => {
             if (entry.target.classList.contains("skill-card")) {
                 const progressBar =
                     entry.target.querySelector(".skill-progress");
-                const progress = progressBar.getAttribute("data-progress");
-                progressBar.style.setProperty("--progress", progress + "%");
-                progressBar.style.width = progress + "%";
+                if (progressBar) {
+                    const progress = progressBar.getAttribute("data-progress");
+                    progressBar.style.setProperty("--progress", progress + "%");
+                    progressBar.style.width = progress + "%";
+                }
             }
         }
     });
@@ -412,7 +452,7 @@ document.querySelectorAll(".skill-card").forEach((el) => observer.observe(el));
 // Projects Slider Variables
 let slider, prevBtn, nextBtn, dots, projectCards;
 let currentSlide = 0;
-let cardWidth = 380; // card width + gap
+let cardWidth = 380;
 let autoPlayInterval;
 
 // Initialize Slider
@@ -422,6 +462,11 @@ function initializeSlider() {
     nextBtn = document.getElementById("nextBtn");
     dots = document.querySelectorAll(".dot");
     projectCards = document.querySelectorAll(".project-card");
+
+    if (!slider || !prevBtn || !nextBtn || projectCards.length === 0) {
+        console.log("Slider elements not fully loaded yet");
+        return;
+    }
 
     // Calculate card width based on screen size
     if (window.innerWidth < 768) {
@@ -518,64 +563,83 @@ function updateDots() {
 
 function goToSlide(index) {
     currentSlide = index;
-    slider.scrollTo({
-        left: cardWidth * index,
-        behavior: "smooth",
-    });
-    updateDots();
+    if (slider) {
+        slider.scrollTo({
+            left: cardWidth * index,
+            behavior: "smooth",
+        });
+        updateDots();
+    }
 }
 
 function startAutoPlay() {
+    stopAutoPlay(); // Clear any existing interval
     autoPlayInterval = setInterval(() => {
-        if (currentSlide < projectCards.length - 1) {
-            goToSlide(currentSlide + 1);
-        } else {
-            goToSlide(0);
+        if (projectCards && projectCards.length > 0) {
+            if (currentSlide < projectCards.length - 1) {
+                goToSlide(currentSlide + 1);
+            } else {
+                goToSlide(0);
+            }
         }
     }, 5000);
 }
 
 function stopAutoPlay() {
-    clearInterval(autoPlayInterval);
+    if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+    }
 }
 
 // Contact Form
 const contactForm = document.getElementById("contactForm");
 const formSuccess = document.getElementById("formSuccess");
 
-contactForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+if (contactForm && formSuccess) {
+    contactForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-    const formData = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        subject: document.getElementById("subject").value,
-        message: document.getElementById("message").value,
-        timestamp: new Date().toISOString(),
-    };
+        const formData = {
+            name: document.getElementById("name").value,
+            email: document.getElementById("email").value,
+            subject: document.getElementById("subject").value,
+            message: document.getElementById("message").value,
+            timestamp: new Date().toISOString(),
+        };
 
-    try {
-        const submissions = JSON.parse(
-            localStorage.getItem("contactSubmissions") || "[]"
-        );
-        submissions.push(formData);
-        localStorage.setItem("contactSubmissions", JSON.stringify(submissions));
+        try {
+            // Try to save to localStorage (may fail in some environments)
+            try {
+                const submissions = JSON.parse(
+                    localStorage.getItem("contactSubmissions") || "[]"
+                );
+                submissions.push(formData);
+                localStorage.setItem(
+                    "contactSubmissions",
+                    JSON.stringify(submissions)
+                );
+            } catch (storageError) {
+                console.log("LocalStorage not available:", storageError);
+            }
 
-        contactForm.style.display = "none";
-        formSuccess.classList.add("show");
+            contactForm.style.display = "none";
+            formSuccess.classList.add("show");
 
-        setTimeout(() => {
-            contactForm.reset();
-            contactForm.style.display = "block";
-            formSuccess.classList.remove("show");
-        }, 3000);
+            setTimeout(() => {
+                contactForm.reset();
+                contactForm.style.display = "block";
+                formSuccess.classList.remove("show");
+            }, 3000);
 
-        console.log("Form submitted:", formData);
-    } catch (error) {
-        console.error("Error saving form data:", error);
-        alert("There was an error submitting your message. Please try again.");
-    }
-});
+            console.log("Form submitted:", formData);
+        } catch (error) {
+            console.error("Error saving form data:", error);
+            alert(
+                "There was an error submitting your message. Please try again."
+            );
+        }
+    });
+}
 
 // Smooth Scroll
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
@@ -606,15 +670,23 @@ window.addEventListener("scroll", () => {
 
 // Typing effect
 const heroSubtitle = document.querySelector(".hero-subtitle");
-const originalText = heroSubtitle.textContent;
-let charIndex = 0;
+if (heroSubtitle) {
+    const originalText = heroSubtitle.textContent;
+    let charIndex = 0;
 
-function typeWriter() {
-    if (charIndex < originalText.length) {
-        heroSubtitle.textContent = originalText.substring(0, charIndex + 1);
-        charIndex++;
-        setTimeout(typeWriter, 100);
+    function typeWriter() {
+        if (charIndex < originalText.length) {
+            heroSubtitle.textContent = originalText.substring(0, charIndex + 1);
+            charIndex++;
+            setTimeout(typeWriter, 100);
+        }
     }
+
+    // Start typing effect
+    window.addEventListener("load", () => {
+        heroSubtitle.textContent = "";
+        setTimeout(typeWriter, 500);
+    });
 }
 
 // Scroll progress indicator
@@ -687,39 +759,34 @@ if (!document.getElementById("ripple-styles")) {
 }
 
 // Custom cursor for desktop
-const cursor = document.createElement("div");
-cursor.style.cssText = `
-    position: fixed;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #6366f1;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 10000;
-    transition: all 0.1s ease;
-    transform: translate(-50%, -50%);
-    display: none;
-`;
-document.body.appendChild(cursor);
-
-const cursorFollower = document.createElement("div");
-cursorFollower.style.cssText = `
-    position: fixed;
-    width: 8px;
-    height: 8px;
-    background: #6366f1;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 10001;
-    transition: all 0.15s ease;
-    transform: translate(-50%, -50%);
-    display: none;
-`;
-document.body.appendChild(cursorFollower);
-
 if (window.innerWidth > 768) {
-    cursor.style.display = "block";
-    cursorFollower.style.display = "block";
+    const cursor = document.createElement("div");
+    cursor.style.cssText = `
+        position: fixed;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #6366f1;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 10000;
+        transition: all 0.1s ease;
+        transform: translate(-50%, -50%);
+    `;
+    document.body.appendChild(cursor);
+
+    const cursorFollower = document.createElement("div");
+    cursorFollower.style.cssText = `
+        position: fixed;
+        width: 8px;
+        height: 8px;
+        background: #6366f1;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 10001;
+        transition: all 0.15s ease;
+        transform: translate(-50%, -50%);
+    `;
+    document.body.appendChild(cursorFollower);
 
     document.addEventListener("mousemove", (e) => {
         cursor.style.left = e.clientX + "px";
@@ -775,13 +842,15 @@ console.log(
     "color: #94a3b8; font-size: 12px;"
 );
 
-// Initialize on page load
-window.addEventListener("load", () => {
-    console.log("Portfolio initializing...");
+// Initialize on page load with retry mechanism
+let initAttempts = 0;
+const maxAttempts = 3;
 
-    // Start typing effect
-    heroSubtitle.textContent = "";
-    setTimeout(typeWriter, 500);
+function initializePortfolio() {
+    initAttempts++;
+    console.log(
+        `Portfolio initialization attempt ${initAttempts}/${maxAttempts}`
+    );
 
     // Fetch GitHub data
     fetchGitHubData();
@@ -789,20 +858,32 @@ window.addEventListener("load", () => {
     // Fetch repositories
     fetchGitHubRepos();
 
-    console.log("Portfolio loaded successfully! ✨");
-});
+    console.log("Portfolio initialized! ✨");
+}
 
-// Also try on DOMContentLoaded in case load event doesn't fire
+// Try multiple initialization strategies
+window.addEventListener("load", initializePortfolio);
+
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("DOM Content Loaded - initializing fallback...");
+    console.log("DOM Content Loaded");
 
-    // If data hasn't loaded after 2 seconds, try again
+    // Wait a bit and try again if needed
     setTimeout(() => {
         const profileImg = document.getElementById("profileImage");
-        if (profileImg && profileImg.src.includes("saddamhosan1.png")) {
-            console.log("Attempting to reload GitHub data...");
-            fetchGitHubData();
-            fetchGitHubRepos();
+        if (
+            profileImg &&
+            (profileImg.src.includes("placeholder") || !profileImg.complete)
+        ) {
+            console.log("Retrying initialization...");
+            initializePortfolio();
         }
     }, 2000);
 });
+
+// Final fallback after 5 seconds
+setTimeout(() => {
+    if (initAttempts === 0) {
+        console.log("Final fallback initialization");
+        initializePortfolio();
+    }
+}, 5000);
