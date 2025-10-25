@@ -1,262 +1,156 @@
-// GitHub Configuration
+// ========== CONFIGURATION ==========
 const GITHUB_USERNAME = "saddamhosan1";
-const GITHUB_API = `https://api.github.com/users/${GITHUB_USERNAME}`;
-const GITHUB_REPOS_API = `https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=100`;
+const GITHUB_API_USER = `https://api.github.com/users/${GITHUB_USERNAME}`;
+const GITHUB_API_REPOS = `https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=100`;
 
-// Add fallback data in case API fails
+// ========== FALLBACK DATA ==========
 const FALLBACK_DATA = {
     name: "Md Saddam Hossan",
-    bio: "Passionate developer with 5+ years of experience crafting modern web applications and custom websites. Specialized in WordPress solutions, integrating OpraSync Systems, and designing digital experiences.",
+    login: "saddamhosan1",
     avatar_url: "https://github.com/saddamhosan1.png",
+    bio: "Passionate developer with 5+ years of experience crafting modern web applications and custom websites. Specialized in WordPress solutions, integrating OpraSync Systems, and designing digital experiences.",
+    location: "Thakurgaon, Rangpur, Bangladesh",
+    email: "goldenseoct54@gmail.com",
+    html_url: "https://github.com/saddamhosan1",
     public_repos: 0,
     followers: 0,
     following: 0,
-    location: "Thakurgaon, Rangpur, Bangladesh",
-    email: "goldenseoct54@gmail.com",
-    login: "saddamhosan1",
-    html_url: "https://github.com/saddamhosan1",
 };
 
-// Fetch GitHub User Data with better error handling
-async function fetchGitHubData() {
+// ========== FETCH GITHUB USER DATA ==========
+async function fetchGitHubUser() {
     try {
-        console.log("Fetching GitHub user data...");
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-
-        const response = await fetch(GITHUB_API, {
-            signal: controller.signal,
-            headers: {
-                Accept: "application/vnd.github.v3+json",
-            },
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("GitHub data received:", data);
-
-        updateUIWithData(data);
-        console.log("GitHub user data updated successfully!");
-    } catch (error) {
-        console.error("Error fetching GitHub user data:", error);
-        console.log("Using fallback data...");
-        updateUIWithData(FALLBACK_DATA);
+        const res = await fetch(GITHUB_API_USER);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        updateUserUI(data);
+    } catch (err) {
+        console.error("GitHub user fetch failed:", err);
+        updateUserUI(FALLBACK_DATA);
     }
 }
 
-// Separate function to update UI with data
-function updateUIWithData(data) {
-    // Update profile images
+// ========== UPDATE USER UI ==========
+function updateUserUI(data) {
+    const avatar = data.avatar_url || FALLBACK_DATA.avatar_url;
+    const name = data.name || data.login || FALLBACK_DATA.name;
+    const bio = data.bio || FALLBACK_DATA.bio;
+    const location = data.location || FALLBACK_DATA.location;
+    const repos = data.public_repos || 0;
+    const followers = data.followers || 0;
+    const following = data.following || 0;
+
+    // Profile images
     const profileImg = document.getElementById("profileImage");
     const aboutProfileImg = document.getElementById("aboutProfileImage");
+    if (profileImg) profileImg.src = avatar;
+    if (aboutProfileImg) aboutProfileImg.src = avatar;
 
-    if (profileImg && data.avatar_url) {
-        profileImg.src = data.avatar_url;
-        profileImg.onerror = () => {
-            console.error("Error loading profile image");
-            profileImg.src = "https://via.placeholder.com/400x400?text=Profile";
-        };
+    // Names
+    const githubName = document.getElementById("githubName");
+    const footerName = document.getElementById("footerName");
+    if (githubName) githubName.textContent = name;
+    if (footerName) footerName.textContent = name;
+
+    // Bio
+    const githubBio = document.getElementById("githubBio");
+    if (githubBio) githubBio.textContent = bio;
+
+    // Location
+    const githubLocation = document.getElementById("githubLocation");
+    if (githubLocation) githubLocation.textContent = location;
+
+    // Stats
+    const totalRepos = document.getElementById("totalRepos");
+    const githubFollowers = document.getElementById("githubFollowers");
+    const totalCommits = document.getElementById("totalCommits");
+    const followersCount = document.getElementById("followersCount");
+    const followingCount = document.getElementById("followingCount");
+
+    if (totalRepos) {
+        totalRepos.textContent = repos;
+        animateCounter(totalRepos, repos);
     }
-
-    if (aboutProfileImg && data.avatar_url) {
-        aboutProfileImg.src = data.avatar_url;
-        aboutProfileImg.onerror = () => {
-            console.error("Error loading about profile image");
-            aboutProfileImg.src =
-                "https://via.placeholder.com/400x400?text=Profile";
-        };
+    if (githubFollowers) {
+        githubFollowers.textContent = followers;
+        animateCounter(githubFollowers, followers);
     }
+    if (totalCommits) totalCommits.textContent = repos;
+    if (followersCount) followersCount.textContent = followers;
+    if (followingCount) followingCount.textContent = following;
 
-    // Update name
-    const displayName = data.name || GITHUB_USERNAME;
-    const nameElement = document.getElementById("githubName");
-    const footerNameElement = document.getElementById("footerName");
-
-    if (nameElement) nameElement.textContent = displayName;
-    if (footerNameElement) footerNameElement.textContent = displayName;
-
-    // Update bio
-    const bioElement = document.getElementById("githubBio");
-    if (bioElement && data.bio) {
-        bioElement.textContent = data.bio;
+    // Email links
+    const email = data.email || FALLBACK_DATA.email;
+    const githubEmail = document.getElementById("githubEmail");
+    const emailLink = document.getElementById("emailLink");
+    if (githubEmail) {
+        githubEmail.textContent = email;
+        githubEmail.href = `mailto:${email}`;
     }
+    if (emailLink) emailLink.href = `mailto:${email}`;
 
-    // Update stats with animation
-    const totalReposElement = document.getElementById("totalRepos");
-    const followersElement = document.getElementById("githubFollowers");
-    const commitsElement = document.getElementById("totalCommits");
-    const followersCountElement = document.getElementById("followersCount");
-    const followingCountElement = document.getElementById("followingCount");
-
-    if (totalReposElement) {
-        totalReposElement.textContent = data.public_repos || "0";
-        setTimeout(
-            () => animateCounter(totalReposElement, data.public_repos || 0),
-            500
-        );
+    // GitHub links
+    const githubUsername = document.getElementById("githubUsername");
+    const githubLink = document.getElementById("githubLink");
+    if (githubUsername) {
+        githubUsername.textContent = `@${data.login}`;
+        githubUsername.href = data.html_url;
     }
-
-    if (followersElement) {
-        followersElement.textContent = data.followers || "0";
-        setTimeout(
-            () => animateCounter(followersElement, data.followers || 0),
-            700
-        );
-    }
-
-    if (commitsElement) commitsElement.textContent = data.public_repos || "0";
-    if (followersCountElement)
-        followersCountElement.textContent = data.followers || "0";
-    if (followingCountElement)
-        followingCountElement.textContent = data.following || "0";
-
-    // Update location
-    const locationElement = document.getElementById("githubLocation");
-    if (locationElement && data.location) {
-        locationElement.textContent = data.location;
-    }
-
-    // Update email
-    const emailElement = document.getElementById("githubEmail");
-    const emailLinkElement = document.getElementById("emailLink");
-
-    if (data.email) {
-        if (emailElement) {
-            emailElement.textContent = data.email;
-            emailElement.href = `mailto:${data.email}`;
-        }
-        if (emailLinkElement) {
-            emailLinkElement.href = `mailto:${data.email}`;
-        }
-    }
-
-    // Update GitHub links
-    const usernameElement = document.getElementById("githubUsername");
-    const githubLinkElement = document.getElementById("githubLink");
-
-    if (usernameElement) {
-        usernameElement.textContent = `@${data.login}`;
-        usernameElement.href = data.html_url;
-    }
-    if (githubLinkElement) {
-        githubLinkElement.href = data.html_url;
-    }
+    if (githubLink) githubLink.href = data.html_url;
 }
 
-// Fetch GitHub Repositories with better error handling
+// ========== FETCH GITHUB REPOS ==========
 async function fetchGitHubRepos() {
-    const loadingElement = document.getElementById("projectsLoading");
-    const containerElement = document.getElementById("projectsContainer");
+    const loading = document.getElementById("projectsLoading");
+    const container = document.getElementById("projectsContainer");
 
     try {
-        console.log("Fetching GitHub repositories...");
+        const res = await fetch(GITHUB_API_REPOS);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const repos = await res.json();
 
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        if (loading) loading.style.display = "none";
+        if (container) container.style.display = "block";
 
-        const response = await fetch(GITHUB_REPOS_API, {
-            signal: controller.signal,
-            headers: {
-                Accept: "application/vnd.github.v3+json",
-            },
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const repos = await response.json();
-        console.log(`Fetched ${repos.length} repositories`);
-
-        // Hide loading, show container
-        if (loadingElement) loadingElement.style.display = "none";
-        if (containerElement) containerElement.style.display = "block";
-
-        // Filter out forks and sort by stars
-        const filteredRepos = repos
-            .filter((repo) => !repo.fork)
+        const filtered = repos
+            .filter((r) => !r.fork)
             .sort((a, b) => b.stargazers_count - a.stargazers_count);
 
-        console.log(`Displaying ${filteredRepos.length} repositories`);
-
-        if (filteredRepos.length > 0) {
-            displayProjects(filteredRepos);
+        if (filtered.length > 0) {
+            displayProjects(filtered);
         } else {
-            if (loadingElement) {
-                loadingElement.style.display = "block";
-                loadingElement.innerHTML = `
-                    <p style="color: var(--text-muted);">No repositories found. Start creating amazing projects!</p>
-                `;
-            }
+            showNoProjects();
         }
-    } catch (error) {
-        console.error("Error fetching repositories:", error);
-        if (loadingElement) {
-            loadingElement.style.display = "block";
-            loadingElement.innerHTML = `
-                <div style="text-align: center; padding: 40px;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #f59e0b; margin-bottom: 20px;"></i>
-                    <p style="color: var(--text-muted); margin-bottom: 15px;">Unable to load projects from GitHub.</p>
-                    <p style="color: var(--text-muted); font-size: 14px;">Please check your internet connection or try again later.</p>
-                    <button onclick="fetchGitHubRepos()" class="btn btn-primary" style="margin-top: 20px;">
-                        Retry <i class="fas fa-redo"></i>
-                    </button>
-                </div>
-            `;
-        }
+    } catch (err) {
+        console.error("GitHub repos fetch failed:", err);
+        showError();
     }
 }
 
-// Display Projects
+// ========== DISPLAY PROJECTS ==========
 function displayProjects(repos) {
     const slider = document.getElementById("projectsSlider");
-    const dotsContainer = document.getElementById("sliderDots");
+    const dots = document.getElementById("sliderDots");
 
-    if (!slider || !dotsContainer) {
-        console.error("Slider elements not found");
-        return;
-    }
+    if (!slider || !dots) return;
 
     slider.innerHTML = "";
-    dotsContainer.innerHTML = "";
+    dots.innerHTML = "";
 
-    console.log("Creating project cards...");
-
-    repos.forEach((repo, index) => {
-        // Create project card
+    repos.forEach((repo, i) => {
         const card = document.createElement("div");
         card.className = "project-card";
 
-        // Get language color
-        const languageColor = getLanguageColor(repo.language);
-
-        // Format description
-        const description =
+        const color = getLanguageColor(repo.language);
+        const name = formatName(repo.name);
+        const desc =
             repo.description ||
             "A great project built with passion and dedication.";
-        const truncatedDescription =
-            description.length > 120
-                ? description.substring(0, 120) + "..."
-                : description;
-
-        // Format repo name
-        const formattedName = repo.name
-            .replace(/-/g, " ")
-            .replace(/_/g, " ")
-            .split(" ")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ");
+        const shortDesc =
+            desc.length > 120 ? desc.substring(0, 120) + "..." : desc;
 
         card.innerHTML = `
-            <div class="project-image" style="background: linear-gradient(135deg, ${languageColor}33 0%, ${languageColor}11 100%);">
+            <div class="project-image" style="background: linear-gradient(135deg, ${color}33 0%, ${color}11 100%);">
                 <div class="project-overlay">
                     <a href="${
                         repo.html_url
@@ -275,8 +169,8 @@ function displayProjects(repos) {
                 </div>
             </div>
             <div class="project-content">
-                <h3>${formattedName}</h3>
-                <p>${truncatedDescription}</p>
+                <h3>${name}</h3>
+                <p>${shortDesc}</p>
                 <div class="project-tags">
                     ${
                         repo.language
@@ -284,13 +178,10 @@ function displayProjects(repos) {
                             : ""
                     }
                     ${
-                        repo.topics && repo.topics.length > 0
+                        repo.topics
                             ? repo.topics
                                   .slice(0, 2)
-                                  .map(
-                                      (topic) =>
-                                          `<span class="tag">${topic}</span>`
-                                  )
+                                  .map((t) => `<span class="tag">${t}</span>`)
                                   .join("")
                             : ""
                     }
@@ -313,24 +204,26 @@ function displayProjects(repos) {
 
         slider.appendChild(card);
 
-        // Create dot
         const dot = document.createElement("div");
         dot.className = "dot";
-        if (index === 0) dot.classList.add("active");
-        dot.addEventListener("click", () => goToSlide(index));
-        dotsContainer.appendChild(dot);
+        if (i === 0) dot.classList.add("active");
+        dot.addEventListener("click", () => goToSlide(i));
+        dots.appendChild(dot);
     });
 
-    console.log(`Created ${repos.length} project cards`);
-
-    // Initialize slider after a short delay
-    setTimeout(() => {
-        initializeSlider();
-    }, 100);
+    setTimeout(initSlider, 100);
 }
 
-// Get language color
-function getLanguageColor(language) {
+// ========== HELPER FUNCTIONS ==========
+function formatName(name) {
+    return name
+        .replace(/[-_]/g, " ")
+        .split(" ")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+}
+
+function getLanguageColor(lang) {
     const colors = {
         JavaScript: "#f1e05a",
         TypeScript: "#2b7489",
@@ -348,31 +241,110 @@ function getLanguageColor(language) {
         Vue: "#41b883",
         React: "#61dafb",
     };
-    return colors[language] || "#6366f1";
+    return colors[lang] || "#6366f1";
 }
 
-// Counter Animation
-function animateCounter(element, target) {
-    if (!element || !target) return;
-
-    const duration = 2000;
-    const increment = target / (duration / 16);
+function animateCounter(el, target) {
+    if (!el || !target) return;
     let current = 0;
-
-    const updateCounter = () => {
+    const increment = target / 100;
+    const timer = setInterval(() => {
         current += increment;
-        if (current < target) {
-            element.textContent = Math.floor(current);
-            requestAnimationFrame(updateCounter);
+        if (current >= target) {
+            el.textContent = target;
+            clearInterval(timer);
         } else {
-            element.textContent = target;
+            el.textContent = Math.floor(current);
         }
+    }, 20);
+}
+
+function showNoProjects() {
+    const loading = document.getElementById("projectsLoading");
+    if (loading) {
+        loading.style.display = "block";
+        loading.innerHTML = `<p style="color: var(--text-muted);">No repositories found. Start creating amazing projects!</p>`;
+    }
+}
+
+function showError() {
+    const loading = document.getElementById("projectsLoading");
+    if (loading) {
+        loading.style.display = "block";
+        loading.innerHTML = `
+            <div style="text-align: center; padding: 40px;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #f59e0b; margin-bottom: 20px;"></i>
+                <p style="color: var(--text-muted); margin-bottom: 15px;">Unable to load projects from GitHub.</p>
+                <button onclick="fetchGitHubRepos()" class="btn btn-primary" style="margin-top: 20px;">
+                    Retry <i class="fas fa-redo"></i>
+                </button>
+            </div>
+        `;
+    }
+}
+
+// ========== SLIDER LOGIC ==========
+let currentSlide = 0;
+let slider, prevBtn, nextBtn, dots, cards;
+let autoPlay;
+
+function initSlider() {
+    slider = document.getElementById("projectsSlider");
+    prevBtn = document.getElementById("prevBtn");
+    nextBtn = document.getElementById("nextBtn");
+    dots = document.querySelectorAll(".dot");
+    cards = document.querySelectorAll(".project-card");
+
+    if (!slider || !prevBtn || !nextBtn || cards.length === 0) return;
+
+    prevBtn.onclick = () => {
+        if (currentSlide > 0) goToSlide(currentSlide - 1);
+        stopAutoPlay();
     };
 
-    updateCounter();
+    nextBtn.onclick = () => {
+        if (currentSlide < cards.length - 1) goToSlide(currentSlide + 1);
+        stopAutoPlay();
+    };
+
+    slider.addEventListener("scroll", () => {
+        const cardWidth = cards[0].offsetWidth + 30;
+        currentSlide = Math.round(slider.scrollLeft / cardWidth);
+        updateDots();
+    });
+
+    startAutoPlay();
+    slider.addEventListener("mouseenter", stopAutoPlay);
+    slider.addEventListener("mouseleave", startAutoPlay);
 }
 
-// Navbar Scroll Effect
+function goToSlide(index) {
+    currentSlide = index;
+    const cardWidth = cards[0].offsetWidth + 30;
+    slider.scrollTo({ left: cardWidth * index, behavior: "smooth" });
+    updateDots();
+}
+
+function updateDots() {
+    dots.forEach((dot, i) => {
+        dot.classList.toggle("active", i === currentSlide);
+    });
+}
+
+function startAutoPlay() {
+    stopAutoPlay();
+    autoPlay = setInterval(() => {
+        if (cards && cards.length > 0) {
+            goToSlide(currentSlide < cards.length - 1 ? currentSlide + 1 : 0);
+        }
+    }, 5000);
+}
+
+function stopAutoPlay() {
+    if (autoPlay) clearInterval(autoPlay);
+}
+
+// ========== NAVBAR ==========
 const navbar = document.getElementById("navbar");
 const navLinks = document.querySelectorAll(".nav-link");
 
@@ -383,12 +355,10 @@ window.addEventListener("scroll", () => {
         navbar.classList.remove("scrolled");
     }
 
-    // Active nav link on scroll
     let current = "";
     document.querySelectorAll("section").forEach((section) => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        if (window.scrollY >= sectionTop - 100) {
+        const top = section.offsetTop;
+        if (window.scrollY >= top - 100) {
             current = section.getAttribute("id");
         }
     });
@@ -401,489 +371,123 @@ window.addEventListener("scroll", () => {
     });
 });
 
-// Mobile Menu Toggle
+// ========== MOBILE MENU ==========
 const mobileToggle = document.getElementById("mobileToggle");
 const navLinksContainer = document.getElementById("navLinks");
 
 if (mobileToggle && navLinksContainer) {
-    mobileToggle.addEventListener("click", () => {
+    mobileToggle.onclick = () => {
         mobileToggle.classList.toggle("active");
         navLinksContainer.classList.toggle("active");
-    });
+    };
 
-    // Close mobile menu when clicking on a link
     navLinks.forEach((link) => {
-        link.addEventListener("click", () => {
+        link.onclick = () => {
             mobileToggle.classList.remove("active");
             navLinksContainer.classList.remove("active");
-        });
+        };
     });
 }
 
-// Intersection Observer for Animations
-const observerOptions = {
-    threshold: 0.2,
-    rootMargin: "0px 0px -100px 0px",
-};
+// ========== INTERSECTION OBSERVER ==========
+const observer = new IntersectionObserver(
+    (entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("aos-animate");
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add("aos-animate");
-
-            // Animate skill progress bars
-            if (entry.target.classList.contains("skill-card")) {
-                const progressBar =
-                    entry.target.querySelector(".skill-progress");
-                if (progressBar) {
-                    const progress = progressBar.getAttribute("data-progress");
-                    progressBar.style.setProperty("--progress", progress + "%");
-                    progressBar.style.width = progress + "%";
+                if (entry.target.classList.contains("skill-card")) {
+                    const bar = entry.target.querySelector(".skill-progress");
+                    if (bar) {
+                        const progress = bar.getAttribute("data-progress");
+                        bar.style.width = progress + "%";
+                    }
                 }
             }
-        }
-    });
-}, observerOptions);
+        });
+    },
+    { threshold: 0.2 }
+);
 
-// Observe all animated elements
 document.querySelectorAll("[data-aos]").forEach((el) => observer.observe(el));
 document.querySelectorAll(".skill-card").forEach((el) => observer.observe(el));
 
-// Projects Slider Variables
-let slider, prevBtn, nextBtn, dots, projectCards;
-let currentSlide = 0;
-let cardWidth = 380;
-let autoPlayInterval;
-
-// Initialize Slider
-function initializeSlider() {
-    slider = document.getElementById("projectsSlider");
-    prevBtn = document.getElementById("prevBtn");
-    nextBtn = document.getElementById("nextBtn");
-    dots = document.querySelectorAll(".dot");
-    projectCards = document.querySelectorAll(".project-card");
-
-    if (!slider || !prevBtn || !nextBtn || projectCards.length === 0) {
-        console.log("Slider elements not fully loaded yet");
-        return;
-    }
-
-    // Calculate card width based on screen size
-    if (window.innerWidth < 768) {
-        cardWidth = 290;
-    } else if (window.innerWidth < 1024) {
-        cardWidth = 330;
-    }
-
-    // Button click events
-    prevBtn.addEventListener("click", () => {
-        if (currentSlide > 0) {
-            goToSlide(currentSlide - 1);
-        }
-        stopAutoPlay();
-    });
-
-    nextBtn.addEventListener("click", () => {
-        if (currentSlide < projectCards.length - 1) {
-            goToSlide(currentSlide + 1);
-        }
-        stopAutoPlay();
-    });
-
-    // Update current slide on scroll
-    let scrollTimeout;
-    slider.addEventListener("scroll", () => {
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-            const scrollPosition = slider.scrollLeft;
-            currentSlide = Math.round(scrollPosition / cardWidth);
-            updateDots();
-        }, 150);
-    });
-
-    // Touch/Swipe Support
-    let touchStartX = 0;
-    let touchEndX = 0;
-
-    slider.addEventListener("touchstart", (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-    });
-
-    slider.addEventListener("touchend", (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    });
-
-    function handleSwipe() {
-        if (touchStartX - touchEndX > 50) {
-            if (currentSlide < projectCards.length - 1) {
-                goToSlide(currentSlide + 1);
-            }
-        }
-        if (touchEndX - touchStartX > 50) {
-            if (currentSlide > 0) {
-                goToSlide(currentSlide - 1);
-            }
-        }
-    }
-
-    // Auto-play
-    startAutoPlay();
-    slider.addEventListener("mouseenter", stopAutoPlay);
-    slider.addEventListener("mouseleave", startAutoPlay);
-
-    // Project card hover effects
-    projectCards.forEach((card) => {
-        card.addEventListener("mousemove", function (e) {
-            const rect = this.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-
-            const rotateX = (y - centerY) / 20;
-            const rotateY = (centerX - x) / 20;
-
-            this.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-15px)`;
-        });
-
-        card.addEventListener("mouseleave", function () {
-            this.style.transform =
-                "perspective(1000px) rotateX(0) rotateY(0) translateY(0)";
-        });
-    });
-}
-
-function updateDots() {
-    dots.forEach((dot, index) => {
-        dot.classList.toggle("active", index === currentSlide);
-    });
-}
-
-function goToSlide(index) {
-    currentSlide = index;
-    if (slider) {
-        slider.scrollTo({
-            left: cardWidth * index,
-            behavior: "smooth",
-        });
-        updateDots();
-    }
-}
-
-function startAutoPlay() {
-    stopAutoPlay(); // Clear any existing interval
-    autoPlayInterval = setInterval(() => {
-        if (projectCards && projectCards.length > 0) {
-            if (currentSlide < projectCards.length - 1) {
-                goToSlide(currentSlide + 1);
-            } else {
-                goToSlide(0);
-            }
-        }
-    }, 5000);
-}
-
-function stopAutoPlay() {
-    if (autoPlayInterval) {
-        clearInterval(autoPlayInterval);
-    }
-}
-
-// Contact Form
+// ========== CONTACT FORM ==========
 const contactForm = document.getElementById("contactForm");
 const formSuccess = document.getElementById("formSuccess");
 
 if (contactForm && formSuccess) {
-    contactForm.addEventListener("submit", async (e) => {
+    contactForm.onsubmit = (e) => {
         e.preventDefault();
 
-        const formData = {
-            name: document.getElementById("name").value,
-            email: document.getElementById("email").value,
-            subject: document.getElementById("subject").value,
-            message: document.getElementById("message").value,
-            timestamp: new Date().toISOString(),
-        };
-
-        try {
-            // Try to save to localStorage (may fail in some environments)
-            try {
-                const submissions = JSON.parse(
-                    localStorage.getItem("contactSubmissions") || "[]"
-                );
-                submissions.push(formData);
-                localStorage.setItem(
-                    "contactSubmissions",
-                    JSON.stringify(submissions)
-                );
-            } catch (storageError) {
-                console.log("LocalStorage not available:", storageError);
-            }
-
-            contactForm.style.display = "none";
-            formSuccess.classList.add("show");
-
-            setTimeout(() => {
-                contactForm.reset();
-                contactForm.style.display = "block";
-                formSuccess.classList.remove("show");
-            }, 3000);
-
-            console.log("Form submitted:", formData);
-        } catch (error) {
-            console.error("Error saving form data:", error);
-            alert(
-                "There was an error submitting your message. Please try again."
-            );
-        }
-    });
-}
-
-// Smooth Scroll
-document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-    anchor.addEventListener("click", function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute("href"));
-        if (target) {
-            const offsetTop = target.offsetTop - 80;
-            window.scrollTo({
-                top: offsetTop,
-                behavior: "smooth",
-            });
-        }
-    });
-});
-
-// Parallax effect for background orbs
-window.addEventListener("scroll", () => {
-    const scrolled = window.scrollY;
-    const orbs = document.querySelectorAll(".gradient-orb");
-
-    orbs.forEach((orb, index) => {
-        const speed = 0.5 + index * 0.2;
-        const yPos = -(scrolled * speed);
-        orb.style.transform = `translateY(${yPos}px)`;
-    });
-});
-
-// Typing effect
-const heroSubtitle = document.querySelector(".hero-subtitle");
-if (heroSubtitle) {
-    const originalText = heroSubtitle.textContent;
-    let charIndex = 0;
-
-    function typeWriter() {
-        if (charIndex < originalText.length) {
-            heroSubtitle.textContent = originalText.substring(0, charIndex + 1);
-            charIndex++;
-            setTimeout(typeWriter, 100);
-        }
-    }
-
-    // Start typing effect
-    window.addEventListener("load", () => {
-        heroSubtitle.textContent = "";
-        setTimeout(typeWriter, 500);
-    });
-}
-
-// Scroll progress indicator
-const createScrollProgress = () => {
-    const progressBar = document.createElement("div");
-    progressBar.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 0%;
-        height: 3px;
-        background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
-        z-index: 10000;
-        transition: width 0.1s ease;
-    `;
-    progressBar.id = "scroll-progress";
-    document.body.appendChild(progressBar);
-
-    window.addEventListener("scroll", () => {
-        const windowHeight =
-            document.documentElement.scrollHeight -
-            document.documentElement.clientHeight;
-        const scrolled = (window.scrollY / windowHeight) * 100;
-        progressBar.style.width = scrolled + "%";
-    });
-};
-
-createScrollProgress();
-
-// Button ripple effect
-document.querySelectorAll(".btn").forEach((btn) => {
-    btn.addEventListener("mouseenter", function (e) {
-        const ripple = document.createElement("span");
-        ripple.style.cssText = `
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            transform: translate(-50%, -50%);
-            animation: ripple 0.6s ease-out;
-            pointer-events: none;
-        `;
-
-        const rect = this.getBoundingClientRect();
-        ripple.style.left = e.clientX - rect.left + "px";
-        ripple.style.top = e.clientY - rect.top + "px";
-
-        this.style.position = "relative";
-        this.style.overflow = "hidden";
-        this.appendChild(ripple);
-
-        setTimeout(() => ripple.remove(), 600);
-    });
-});
-
-if (!document.getElementById("ripple-styles")) {
-    const style = document.createElement("style");
-    style.id = "ripple-styles";
-    style.textContent = `
-        @keyframes ripple {
-            to {
-                width: 300px;
-                height: 300px;
-                opacity: 0;
-            }
-        }
-    `;
-    document.head.appendChild(style);
-}
-
-// Custom cursor for desktop
-if (window.innerWidth > 768) {
-    const cursor = document.createElement("div");
-    cursor.style.cssText = `
-        position: fixed;
-        width: 20px;
-        height: 20px;
-        border: 2px solid #6366f1;
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 10000;
-        transition: all 0.1s ease;
-        transform: translate(-50%, -50%);
-    `;
-    document.body.appendChild(cursor);
-
-    const cursorFollower = document.createElement("div");
-    cursorFollower.style.cssText = `
-        position: fixed;
-        width: 8px;
-        height: 8px;
-        background: #6366f1;
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 10001;
-        transition: all 0.15s ease;
-        transform: translate(-50%, -50%);
-    `;
-    document.body.appendChild(cursorFollower);
-
-    document.addEventListener("mousemove", (e) => {
-        cursor.style.left = e.clientX + "px";
-        cursor.style.top = e.clientY + "px";
+        contactForm.style.display = "none";
+        formSuccess.classList.add("show");
 
         setTimeout(() => {
-            cursorFollower.style.left = e.clientX + "px";
-            cursorFollower.style.top = e.clientY + "px";
-        }, 50);
-    });
-
-    document
-        .querySelectorAll("a, button, .btn, .project-card, .skill-card")
-        .forEach((el) => {
-            el.addEventListener("mouseenter", () => {
-                cursor.style.width = "40px";
-                cursor.style.height = "40px";
-                cursor.style.borderColor = "#8b5cf6";
-            });
-
-            el.addEventListener("mouseleave", () => {
-                cursor.style.width = "20px";
-                cursor.style.height = "20px";
-                cursor.style.borderColor = "#6366f1";
-            });
-        });
+            contactForm.reset();
+            contactForm.style.display = "block";
+            formSuccess.classList.remove("show");
+        }, 3000);
+    };
 }
 
-// Handle visibility change
-document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-        stopAutoPlay();
-    } else {
-        startAutoPlay();
-    }
-});
-
-// Console message
-console.log(
-    "%c👋 Hello Developer!",
-    "color: #6366f1; font-size: 24px; font-weight: bold;"
-);
-console.log(
-    "%cThanks for checking out the code! 🚀",
-    "color: #8b5cf6; font-size: 16px;"
-);
-console.log(
-    "%cBuilt with ❤️ by Md Saddam Hossan",
-    "color: #ec4899; font-size: 14px;"
-);
-console.log(
-    "%cGitHub: https://github.com/saddamhosan1",
-    "color: #94a3b8; font-size: 12px;"
-);
-
-// Initialize on page load with retry mechanism
-let initAttempts = 0;
-const maxAttempts = 3;
-
-function initializePortfolio() {
-    initAttempts++;
-    console.log(
-        `Portfolio initialization attempt ${initAttempts}/${maxAttempts}`
-    );
-
-    // Fetch GitHub data
-    fetchGitHubData();
-
-    // Fetch repositories
-    fetchGitHubRepos();
-
-    console.log("Portfolio initialized! ✨");
-}
-
-// Try multiple initialization strategies
-window.addEventListener("load", initializePortfolio);
-
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("DOM Content Loaded");
-
-    // Wait a bit and try again if needed
-    setTimeout(() => {
-        const profileImg = document.getElementById("profileImage");
-        if (
-            profileImg &&
-            (profileImg.src.includes("placeholder") || !profileImg.complete)
-        ) {
-            console.log("Retrying initialization...");
-            initializePortfolio();
+// ========== SMOOTH SCROLL ==========
+document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.onclick = (e) => {
+        const href = anchor.getAttribute("href");
+        const target = document.querySelector(href);
+        if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: "smooth" });
         }
-    }, 2000);
+    };
 });
 
-// Final fallback after 5 seconds
-setTimeout(() => {
-    if (initAttempts === 0) {
-        console.log("Final fallback initialization");
-        initializePortfolio();
+// ========== SCROLL PROGRESS ==========
+const progress = document.createElement("div");
+progress.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+    z-index: 10000;
+    transition: width 0.1s ease;
+`;
+document.body.appendChild(progress);
+
+window.addEventListener("scroll", () => {
+    const h =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+    const scrolled = (window.scrollY / h) * 100;
+    progress.style.width = scrolled + "%";
+});
+
+// ========== TYPING EFFECT ==========
+const subtitle = document.querySelector(".hero-subtitle");
+if (subtitle) {
+    const text = subtitle.textContent;
+    let i = 0;
+    subtitle.textContent = "";
+
+    function type() {
+        if (i < text.length) {
+            subtitle.textContent += text.charAt(i);
+            i++;
+            setTimeout(type, 100);
+        }
     }
-}, 5000);
+
+    setTimeout(type, 500);
+}
+
+// ========== INITIALIZE ==========
+console.log("Portfolio initializing...");
+fetchGitHubUser();
+fetchGitHubRepos();
+console.log("Portfolio loaded! ✨");
+
+// ========== EXPOSE RETRY FUNCTION ==========
+window.fetchGitHubRepos = fetchGitHubRepos;
