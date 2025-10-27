@@ -2086,17 +2086,6 @@ iframe,
     display: block;
 }
 
-/* Constrain main containers and sections */
-.container,
-section,
-.hero-content,
-.about-content,
-.blog-grid {
-    min-width: 0; /* prevents flex/grid children from forcing wider width */
-    width: 100%;
-    overflow: visible;
-}
-
 /* Background / decorative orbs and particle canvas adjustments */
 .background-animation,
 #particleCanvas {
@@ -2113,11 +2102,6 @@ section,
     transform: translateX(-50%);
     max-width: 140vw;
 }
-
-/* Slick slider specific safety */
-/* .projects-slider .slick-slide {
-    min-width: 0;
-} */
 
 /* Small-screen specific fixes */
 @media (max-width: 450px) {
