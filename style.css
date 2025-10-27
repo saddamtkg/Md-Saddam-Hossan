@@ -51,10 +51,9 @@ body {
 }
 
 .container {
-    width: 1440px;
-    max-width: 90%;
+    width: 90%;
+    max-width: 1440px;
     margin: 0 auto;
-    padding: 0 20px;
 }
 
 section {
@@ -914,6 +913,8 @@ section {
 
 .projects-slider.slick-dotted.slick-slider {
     margin-bottom: 0;
+    position: static !important;
+    padding: 0;
 }
 
 .project-meta {
@@ -935,7 +936,7 @@ section {
     overflow: hidden;
     border: 1px solid var(--border-color);
     transition: all 0.4s ease;
-    cursor: pointer;
+    /* cursor: pointer; */
     position: relative;
 }
 
@@ -1617,44 +1618,43 @@ section {
     .skills-preview {
         margin-top: 30px;
     }
-
-    .projects-slider-wrapper {
-        padding: 0 60px;
-    }
-
     .project-card {
         min-width: 340px;
     }
 }
 
-/* Mobile */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
+    .mobile-toggle {
+        display: flex;
+    }
+
     .nav-links {
         position: fixed;
         top: 76px;
         left: -100%;
-        width: 100%;
-        height: calc(100vh - 76px);
+        padding: 32px;
+        height: auto;
         background: rgba(10, 14, 26, 0.98);
         backdrop-filter: blur(20px);
         flex-direction: column;
-        justify-content: center;
-        gap: 30px;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: 15px;
         transition: left 0.3s ease;
         border-top: 1px solid var(--border-color);
     }
 
-    .nav-links.active {
+        .nav-links.active {
         left: 0;
     }
 
     .nav-link {
         font-size: 24px;
     }
+}
 
-    .mobile-toggle {
-        display: flex;
-    }
+/* Mobile */
+@media (max-width: 768px) {
 
     section {
         padding: 60px 0;
@@ -1717,10 +1717,6 @@ section {
     .skills-grid {
         grid-template-columns: 1fr;
         gap: 20px;
-    }
-
-    .projects-slider-wrapper {
-        padding: 0 50px;
     }
 
     .project-card {
@@ -1923,15 +1919,25 @@ section {
 
 .projects-slider .slick-list {
     overflow: visible;
-    padding: 20px 0 !important;
+    padding-bottom: 35px !important;
+}
+
+.slick-next:before,
+.slick-prev:before {
+    display: none;
+}
+
+.slick-next:focus,
+.slick-next:hover,
+.slick-prev:hover {
+    color: #fff;
 }
 
 /* Custom arrow buttons */
 .projects-slider .slick-prev,
 .projects-slider .slick-next {
-    width: 55px;
-    height: 55px;
-    background: var(--gradient-1);
+    width: 20px;
+    height: 20px;
     border: none;
     border-radius: 50%;
     color: white;
@@ -1939,27 +1945,11 @@ section {
     cursor: pointer;
     transition: all 0.3s ease;
     z-index: 10;
-    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
-}
-
-.projects-slider .slick-prev:hover,
-.projects-slider .slick-next:hover {
-    transform: scale(1.1);
-    box-shadow: 0 15px 40px rgba(99, 102, 241, 0.6);
-    background: var(--gradient-1);
 }
 
 .projects-slider .slick-prev:before,
 .projects-slider .slick-next:before {
     display: none;
-}
-
-.projects-slider .slick-prev {
-    left: -70px;
-}
-
-.projects-slider .slick-next {
-    right: -70px;
 }
 
 .projects-slider .slick-prev i,
@@ -2028,21 +2018,8 @@ section {
 }
 
 /* Responsive adjustments for Slick */
-@media (max-width: 1024px) {
-    .projects-slider .slick-prev {
-        left: -60px;
-    }
-
-    .projects-slider .slick-next {
-        right: -60px;
-    }
-}
 
 @media (max-width: 768px) {
-    .projects-slider-wrapper {
-        padding: 0 60px;
-    }
-
     .projects-slider .slick-prev {
         left: 0;
         width: 45px;
@@ -2062,10 +2039,6 @@ section {
 }
 
 @media (max-width: 480px) {
-    .projects-slider-wrapper {
-        padding: 0 10px;
-    }
-
     .projects-slider .slick-prev,
     .projects-slider .slick-next {
         display: none !important;
@@ -2084,3 +2057,89 @@ section {
     display: none !important;
 }
 /* End of style.css */
+
+
+
+/* ...existing code... */
+
+/* Fix horizontal overflow on small screens */
+html, body {
+    overflow-x: hidden;
+}
+
+/* Ensure all elements use border-box sizing */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* Prevent media (images/canvas/svg) from stretching past viewport */
+img,
+picture,
+svg,
+canvas,
+iframe,
+.video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Constrain main containers and sections */
+.container,
+section,
+.hero-content,
+.about-content,
+.blog-grid {
+    min-width: 0; /* prevents flex/grid children from forcing wider width */
+    width: 100%;
+    overflow: visible;
+}
+
+/* Background / decorative orbs and particle canvas adjustments */
+.background-animation,
+#particleCanvas {
+    width: 100vw;
+    left: 0;
+    right: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* If gradient-orb is absolutely positioned and large, center and limit size */
+.gradient-orb {
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 140vw;
+}
+
+/* Slick slider specific safety */
+/* .projects-slider .slick-slide {
+    min-width: 0;
+} */
+
+/* Small-screen specific fixes */
+@media (max-width: 450px) {
+    .hero-content,
+    .about-content {
+        flex-wrap: wrap;
+    }
+
+    .gradient-orb {
+        max-width: 120vw;
+    }
+
+    #particleCanvas {
+        /* make sure canvas does not overflow viewport on small devices */
+        width: 100vw !important;
+        height: auto !important;
+    }
+
+    /* if any element uses large negative margins, reset them */
+    [style*="margin-left"],
+    [style*="margin-right"] {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+}
