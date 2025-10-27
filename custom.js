@@ -51,7 +51,7 @@ function initializeApp() {
 
 // ========== TYPING EFFECT ==========
 const typingTexts = [
-    "Full Stack Developer",
+    "Front-end Developer",
     "WordPress Expert",
     "Shopify Developer",
     "Webflow Designer",
@@ -525,11 +525,13 @@ const SKILLS = [
     { name: "HTML5", icon: "fab fa-html5", progress: 95 },
     { name: "CSS3", icon: "fab fa-css3-alt", progress: 92 },
     { name: "JavaScript", icon: "fab fa-js", progress: 88 },
-    { name: "React", icon: "fab fa-react", progress: 85 },
+    // { name: "React", icon: "fab fa-react", progress: 85 },
     { name: "WordPress", icon: "fab fa-wordpress", progress: 90 },
     { name: "PHP", icon: "fab fa-php", progress: 82 },
     { name: "Git", icon: "fab fa-git-alt", progress: 87 },
-    { name: "Node.js", icon: "fab fa-node", progress: 78 },
+    { name: "Webflow", icon: "fab fa-globe", progress: 87 },
+    { name: "Shopify", icon: "fas fa-shopping-bag", progress: 85 },
+    // { name: "Node.js", icon: "fab fa-node", progress: 78 },
 ];
 
 function renderSkills() {
