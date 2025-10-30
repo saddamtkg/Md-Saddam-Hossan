@@ -483,7 +483,7 @@ function initSlickSlider() {
         speed: 500,
         slidesToShow: 3,
         slidesToScroll: 1,
-        autoplay: false,
+        autoplay: true,
         autoplaySpeed: 6000,
         pauseOnHover: true,
         pauseOnFocus: true,
@@ -766,56 +766,77 @@ console.log("Portfolio initialized successfully!");
 
 // ========== RECENT EDITS ==========
 
-function syncTallestProjectImageHeight() {
-    // Wait for images to load and Slick slider to initialize
+function syncTallestHeight({
+    containerSelector,
+    itemSelector,
+    targetSelector = null,
+    delay = 300,
+}) {
     setTimeout(() => {
-        const projectCards = document.querySelectorAll(".project-card");
-        if (!projectCards.length) return;
-
-        // Reset heights first
-        projectCards.forEach((card) => {
-            const image = card.querySelector(".project-image");
-            if (image) {
-                image.style.height = "auto";
-            }
-        });
-
-        // Calculate max height
-        let maxHeight = 0;
-        projectCards.forEach((card) => {
-            const image = card.querySelector(".project-image");
-            if (image) {
-                const height = image.offsetHeight;
-                maxHeight = Math.max(maxHeight, height);
-            }
-        });
-
-        // Set uniform height if we found a valid max height
-        if (maxHeight > 0) {
-            projectCards.forEach((card) => {
-                const image = card.querySelector(".project-image");
-                if (image) {
-                    image.style.height = `${maxHeight}px`;
-                }
-            });
+        const container = document.querySelector(containerSelector);
+        if (!container) {
+            console.warn(`Container "${containerSelector}" not found.`);
+            return;
         }
-    }, 500); // Give time for images to load and slider to initialize
+
+        const items = container.querySelectorAll(itemSelector);
+        if (!items.length) {
+            console.warn(`No items found for selector "${itemSelector}".`);
+            return;
+        }
+
+        // Reset heights
+        items.forEach((item) => {
+            item.style.height = "auto";
+        });
+
+        // Calculate tallest height
+        let maxHeight = 0;
+        items.forEach((item) => {
+            const height = item.getBoundingClientRect().height;
+            maxHeight = Math.max(maxHeight, height);
+        });
+
+        // Apply height
+        items.forEach((item) => {
+            item.style.height = `${maxHeight}px`;
+        });
+
+        // Optional: set CSS variable on target
+        if (targetSelector) {
+            const target = document.querySelector(targetSelector);
+            if (target) {
+                target.style.setProperty("--synced-height", `${maxHeight}px`);
+            }
+        }
+
+        console.log(`Synced tallest height: ${maxHeight}px`);
+    }, delay);
 }
 
-// Add these event listeners
 document.addEventListener("DOMContentLoaded", () => {
-    // Initial sync
-    syncTallestProjectImageHeight();
+    syncTallestHeight({
+        containerSelector: ".slick-track",
+        itemSelector: ".project-card .project-image",
+        targetSelector: ".project-wrapper", // optional
+        delay: 500,
+    });
 
-    // Sync after Slick slider events
-    $("#projectsSlider").on("afterChange", syncTallestProjectImageHeight);
-    $("#projectsSlider").on("init reInit", syncTallestProjectImageHeight);
+    $("#projectsSlider").on("init reInit afterChange", () => {
+        syncTallestHeight({
+            containerSelector: ".slick-track",
+            itemSelector: ".project-card .project-image",
+            targetSelector: ".project-wrapper",
+            delay: 500,
+        });
+    });
 });
 
-// Debounced resize handler
-window.addEventListener(
-    "resize",
-    debounce(() => {
-        syncTallestProjectImageHeight();
-    }, 250)
-);
+window.addEventListener("resize", () => {
+    syncTallestHeight({
+        containerSelector: ".slick-track",
+        itemSelector: ".project-card .project-image",
+        targetSelector: ".project-wrapper",
+        delay: 300,
+    });
+});
