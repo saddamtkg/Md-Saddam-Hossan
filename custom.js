@@ -624,21 +624,21 @@ if (savedTheme === "light") {
     themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
 }
 
-themeToggle.onclick = () => {
-    const currentTheme = document.body.getAttribute("data-theme");
+// themeToggle.onclick = () => {
+//     const currentTheme = document.body.getAttribute("data-theme");
 
-    if (currentTheme === "light") {
-        document.body.removeAttribute("data-theme");
-        themeToggle.classList.remove("active");
-        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-        localStorage.setItem("theme", "dark");
-    } else {
-        document.body.setAttribute("data-theme", "light");
-        themeToggle.classList.add("active");
-        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        localStorage.setItem("theme", "light");
-    }
-};
+//     if (currentTheme === "light") {
+//         document.body.removeAttribute("data-theme");
+//         themeToggle.classList.remove("active");
+//         themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+//         localStorage.setItem("theme", "dark");
+//     } else {
+//         document.body.setAttribute("data-theme", "light");
+//         themeToggle.classList.add("active");
+//         themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+//         localStorage.setItem("theme", "light");
+//     }
+// };
 
 // ========== SCROLL ANIMATIONS ==========
 function initScrollAnimations() {
@@ -765,3 +765,57 @@ window.addEventListener("unhandledrejection", (e) => {
 console.log("Portfolio initialized successfully!");
 
 // ========== RECENT EDITS ==========
+
+function syncTallestProjectImageHeight() {
+    // Wait for images to load and Slick slider to initialize
+    setTimeout(() => {
+        const projectCards = document.querySelectorAll(".project-card");
+        if (!projectCards.length) return;
+
+        // Reset heights first
+        projectCards.forEach((card) => {
+            const image = card.querySelector(".project-image");
+            if (image) {
+                image.style.height = "auto";
+            }
+        });
+
+        // Calculate max height
+        let maxHeight = 0;
+        projectCards.forEach((card) => {
+            const image = card.querySelector(".project-image");
+            if (image) {
+                const height = image.offsetHeight;
+                maxHeight = Math.max(maxHeight, height);
+            }
+        });
+
+        // Set uniform height if we found a valid max height
+        if (maxHeight > 0) {
+            projectCards.forEach((card) => {
+                const image = card.querySelector(".project-image");
+                if (image) {
+                    image.style.height = `${maxHeight}px`;
+                }
+            });
+        }
+    }, 500); // Give time for images to load and slider to initialize
+}
+
+// Add these event listeners
+document.addEventListener("DOMContentLoaded", () => {
+    // Initial sync
+    syncTallestProjectImageHeight();
+
+    // Sync after Slick slider events
+    $("#projectsSlider").on("afterChange", syncTallestProjectImageHeight);
+    $("#projectsSlider").on("init reInit", syncTallestProjectImageHeight);
+});
+
+// Debounced resize handler
+window.addEventListener(
+    "resize",
+    debounce(() => {
+        syncTallestProjectImageHeight();
+    }, 250)
+);
