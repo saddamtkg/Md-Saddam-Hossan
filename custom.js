@@ -481,6 +481,7 @@ function initSlickSlider() {
         dots: true,
         infinite: true,
         speed: 500,
+        fadein: true,
         slidesToShow: 3,
         slidesToScroll: 1,
         autoplay: true,
@@ -766,6 +767,8 @@ console.log("Portfolio initialized successfully!");
 
 // ========== RECENT EDITS ==========
 
+// Function to synchronize the tallest height among a set of elements
+
 function syncTallestHeight({
     containerSelector,
     itemSelector,
@@ -802,7 +805,8 @@ function syncTallestHeight({
             item.style.height = `${maxHeight}px`;
         });
 
-        // Optional: set CSS variable on target
+        // Optional: set CSS variable height: var(--synced-height);
+
         if (targetSelector) {
             const target = document.querySelector(targetSelector);
             if (target) {
@@ -840,3 +844,5 @@ window.addEventListener("resize", () => {
         delay: 300,
     });
 });
+
+// End of custom.js

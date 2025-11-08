@@ -2127,3 +2127,42 @@ iframe,
         margin-right: 0 !important;
     }
 }
+
+
+/* Marquee container */
+.skills-marquee {
+  width: 100%;
+  overflow: hidden;
+}
+.skill-card.aos-animate {
+    width: 350px;
+}
+.skills-grid {
+    padding: 20px 0;
+}
+
+/* Animate the skills grid right-to-left and pause on hover */
+#skillsGrid {
+  display: inline-flex;            /* lays out items horizontally */
+  flex-wrap: nowrap;               /* keeps items in a single row */
+  align-items: center;
+  gap: 1rem;                       /* adjust spacing as needed */
+  width: max-content;              /* let content define width */
+  animation: skills-marquee 30s linear infinite;
+  will-change: transform;
+}
+
+#skillsGrid:hover {
+  animation-play-state: paused;    /* stops on hover */
+}
+
+/* Keyframes for right-to-left motion */
+@keyframes skills-marquee {
+  100%   { transform: translateX(100%); }   /* start off-screen right */
+  100% { transform: translateX(-100%); }  /* end off-screen left */
+}
+
+/* Accessibility: respect reduced motion prefs */
+@media (prefers-reduced-motion: reduce) {
+  #skillsGrid { animation: none; transform: none; }
+}
