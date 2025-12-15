@@ -2133,6 +2133,7 @@ iframe,
 .skills-marquee {
   width: 100%;
   overflow: hidden;
+  position: relative;
 }
 .skill-card.aos-animate {
     width: 350px;
@@ -2148,7 +2149,7 @@ iframe,
   align-items: center;
   gap: 1rem;                       /* adjust spacing as needed */
   width: max-content;              /* let content define width */
-  animation: skills-marquee 30s linear infinite;
+  animation: none;                 /* JavaScript will set this dynamically */
   will-change: transform;
 }
 
@@ -2156,10 +2157,14 @@ iframe,
   animation-play-state: paused;    /* stops on hover */
 }
 
-/* Keyframes for right-to-left motion */
+/* Keyframes for right-to-left motion - offset will be set by JavaScript */
 @keyframes skills-marquee {
-  100%   { transform: translateX(100%); }   /* start off-screen right */
-  100% { transform: translateX(-100%); }  /* end off-screen left */
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(var(--marquee-offset, -50%));  /* Dynamic pixel offset */
+  }
 }
 
 /* Accessibility: respect reduced motion prefs */

@@ -559,6 +559,28 @@ function renderSkills() {
 
         skillsGrid.appendChild(card);
     });
+
+    // Wait for DOM to render, then duplicate and setup animation
+    setTimeout(() => {
+        // Get the width of first set of skills
+        const firstSetWidth = skillsGrid.offsetWidth;
+        
+        // Duplicate all skill cards for seamless infinite loop
+        const skillCards = skillsGrid.querySelectorAll('.skill-card');
+        skillCards.forEach(card => {
+            const clonedCard = card.cloneNode(true);
+            skillsGrid.appendChild(clonedCard);
+        });
+        
+        // After duplication, calculate exact offset
+        setTimeout(() => {
+            // Set exact pixel offset (half of total width = first set width)
+            skillsGrid.style.setProperty('--marquee-offset', `-${firstSetWidth}px`);
+            
+            // Start smooth animation
+            skillsGrid.style.animation = 'skills-marquee 25s linear infinite';
+        }, 50);
+    }, 100);
 }
 
 function animateSkillBars() {
